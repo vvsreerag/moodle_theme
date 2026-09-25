@@ -1,0 +1,63 @@
+{{!
+    Space Moodle Theme - Modern Split Screen Login
+    Inspired by RoseaThemes Space 5.0.7
+}}
+{{> theme_boost/head }}
+
+<body {{{ bodyattributes }}}>
+{{> core/local/toast/wrapper}}
+
+<div id="page-wrapper" class="rui-login-page-wrapper">
+    <div class="rui-login-split">
+        <!-- Left Side: Still Life / Architectural Image -->
+        <div class="rui-login-visual" style="background-image: url('{{config.wwwroot}}/theme/image.php/space/theme/{{output.get_theme_rev}}/login_bg');">
+            <div class="rui-login-visual-overlay"></div>
+        </div>
+
+        <!-- Right Side: Clean White Login Column -->
+        <div class="rui-login-panel">
+            <div class="rui-login-panel-inner">
+                <!-- Large Modern Blue Graduation Cap Logo -->
+                <div class="rui-login-brand-logo text-center">
+                    <svg class="rui-space-cap-icon" width="64" height="64" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 6L4 16L24 26L44 16L24 6Z" stroke="#2563eb" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 20V31C10 35.5 16.5 39.5 24 39.5C31.5 39.5 38 35.5 38 31V20" stroke="#2563eb" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M44 16V28" stroke="#2563eb" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <!-- Main Login Form (core/loginform) -->
+                {{{ output.main_content }}}
+
+                <!-- Modern Login Footer -->
+                <div class="rui-login-footer">
+                    <div class="rui-login-faq">
+                        Need help signing in? See the <a href="https://docs.moodle.org" target="_blank" rel="noopener">Moodle login FAQ</a> or contact your site administrator.
+                    </div>
+                    <div class="rui-login-info-text">
+                        Space 5 ships with WCAG skip links, dark mode, and flexible login layouts. <a href="https://rosea.io" target="_blank" rel="noopener">Explore the theme</a>
+                    </div>
+                    <div class="rui-login-copyright">
+                        Copyright © 2026 Space 5 Premium Moodle Theme. All right reserved.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cookies Notice Pill Button at Bottom Right -->
+            <div class="rui-login-cookies-wrap">
+                <button type="button" class="btn rui-btn-cookies" data-modal="alert" data-modal-title-str='["cookiesenabled", "core"]' data-modal-content-str='["cookiesenabled_help_html", "core"]'>
+                    <i class="fa fa-info-circle mr-1"></i> Cookies notice
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+{{#js}}
+M.util.js_pending('theme_boost/loader');
+require(['theme_boost/loader'], function() {
+  M.util.js_complete('theme_boost/loader');
+});
+{{/js}}

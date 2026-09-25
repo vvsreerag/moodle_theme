@@ -1,0 +1,102 @@
+{{!
+    Space Moodle Theme - Modern Split Login Form
+    Inspired by RoseaThemes Space 5.0.7
+}}
+<div class="rui-login-form-container">
+    {{#error}}
+        <div class="alert alert-danger rui-login-alert" role="alert">
+            <i class="fa fa-exclamation-circle mr-1"></i> {{error}}
+        </div>
+    {{/error}}
+    {{#info}}
+        <div class="alert alert-info rui-login-alert" role="alert">
+            <i class="fa fa-info-circle mr-1"></i> {{info}}
+        </div>
+    {{/info}}
+    {{#maintenance}}
+        <div class="alert alert-warning rui-login-alert" role="alert">
+            {{{maintenance}}}
+        </div>
+    {{/maintenance}}
+
+    <!-- Demo Account Info Box (as shown in Space 5 reference) -->
+    <div class="rui-demo-box">
+        <div class="rui-demo-header">Hi there!</div>
+        <div class="rui-demo-body">Use demo account to check how this theme works.</div>
+        <div class="rui-demo-creds">Login: <strong>student</strong>, password: <strong>Demo123#</strong></div>
+    </div>
+
+    <form class="rui-login-form" action="{{loginurl}}" method="post" id="login">
+        <input id="anchor" type="hidden" name="anchor" value="">
+        <script>document.getElementById('anchor').value = location.hash;</script>
+        <input type="hidden" name="logintoken" value="{{logintoken}}">
+
+        <!-- Username Input with User Icon -->
+        <div class="form-group rui-input-group">
+            <span class="rui-input-icon"><i class="fa fa-user"></i></span>
+            <input type="text" name="username" id="username" class="form-control rui-form-input" value="{{username}}" placeholder="{{^canloginbyemail}}{{#cleanstr}}username{{/cleanstr}}{{/canloginbyemail}}{{#canloginbyemail}}{{#cleanstr}}usernameemail{{/cleanstr}}{{/canloginbyemail}}" autocomplete="username" required>
+        </div>
+
+        <!-- Password Input with Key Icon -->
+        <div class="form-group rui-input-group">
+            <span class="rui-input-icon"><i class="fa fa-key"></i></span>
+            <input type="password" name="password" id="password" class="form-control rui-form-input" placeholder="{{#cleanstr}}password{{/cleanstr}}" autocomplete="current-password" required>
+            <button type="button" class="rui-password-toggle" onclick="var p=document.getElementById('password'); p.type = p.type === 'password' ? 'text' : 'password';" aria-label="Toggle password visibility">
+                <i class="fa fa-eye"></i>
+            </button>
+        </div>
+
+        <!-- Forgotten Password Link -->
+        <div class="rui-forgot-link-wrap">
+            <a href="{{forgotpasswordurl}}" class="rui-forgot-link">Forgotten your username or password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group mb-3">
+            <button class="btn btn-primary rui-btn-login btn-block" type="submit" id="loginbtn">
+                Log in
+            </button>
+        </div>
+    </form>
+
+    {{#canloginasguest}}
+        <div class="rui-or-divider">
+            <span>or</span>
+        </div>
+
+        <form action="{{loginurl}}" method="post" id="guestlogin" class="mb-2">
+            <input type="hidden" name="logintoken" value="{{logintoken}}">
+            <input type="hidden" name="username" value="guest" />
+            <input type="hidden" name="password" value="guest" />
+            <button class="btn rui-btn-guest btn-block" type="submit" id="loginguestbtn">
+                Access as a guest
+            </button>
+        </form>
+        <div class="rui-guest-subtext">Some courses may allow guest access</div>
+    {{/canloginasguest}}
+
+    {{#cansignup}}
+        <div class="mt-3 text-center">
+            <a class="btn btn-outline-secondary btn-sm" href="{{signupurl}}">{{#str}}startsignup{{/str}}</a>
+        </div>
+    {{/cansignup}}
+</div>
+
+{{#js}}
+    {{^error}}
+        {{#autofocusform}}
+            var userNameField = document.getElementById('username');
+            if (userNameField && userNameField.value.length == 0) {
+                userNameField.focus();
+            } else if (document.getElementById('password')) {
+                document.getElementById('password').focus();
+            }
+        {{/autofocusform}}
+    {{/error}}
+    require(['core_form/submit'], function(Submit) {
+        Submit.init("loginbtn");
+        {{#canloginasguest}}
+            Submit.init("loginguestbtn");
+        {{/canloginasguest}}
+    });
+{{/js}}

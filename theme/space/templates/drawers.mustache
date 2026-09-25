@@ -1,0 +1,174 @@
+{{!
+    Space Moodle Theme - Modern Drawers Layout Template
+    Inspired by RoseaThemes Space 5.0.7
+}}
+{{> theme_boost/head }}
+
+<body {{{ bodyattributes }}}>
+{{> core/local/toast/wrapper}}
+<div id="page-wrapper" class="rui-space-wrapper d-print-block">
+
+    {{{ output.standard_top_of_body_html }}}
+
+    <!-- Top Navbar -->
+    {{> theme_space/navbar }}
+
+    <!-- Space Docked Left Sidebar (Screenshots 2, 3, 4, 5) -->
+    {{> theme_space/sidebar }}
+
+    <!-- Course Index Drawer (if in course) -->
+    {{#courseindex}}
+        {{< theme_boost/drawer }}
+            {{$id}}theme_boost-drawers-courseindex{{/id}}
+            {{$drawerheadercontent}}
+                {{> theme_boost/courseindexdrawercontrols}}
+            {{/drawerheadercontent}}
+            {{$drawerclasses}}drawer drawer-left {{#courseindexopen}}show{{/courseindexopen}}{{/drawerclasses}}
+            {{$drawercontent}}
+                {{{courseindex}}}
+            {{/drawercontent}}
+            {{$drawerpreferencename}}drawer-open-index{{/drawerpreferencename}}
+            {{$drawerstate}}show-drawer-left{{/drawerstate}}
+            {{$tooltipplacement}}right{{/tooltipplacement}}
+            {{$closebuttontext}}{{#str}}closecourseindex, core{{/str}}{{/closebuttontext}}
+        {{/ theme_boost/drawer}}
+    {{/courseindex}}
+
+    <!-- Blocks Drawer -->
+    {{#hasblocks}}
+        {{< theme_boost/drawer }}
+            {{$id}}theme_boost-drawers-blocks{{/id}}
+            {{$drawerclasses}}drawer drawer-right{{#blockdraweropen}} show{{/blockdraweropen}}{{/drawerclasses}}
+            {{$drawercontent}}
+                <section class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
+                    {{{ addblockbutton }}}
+                    {{{ sidepreblocks }}}
+                </section>
+            {{/drawercontent}}
+            {{$drawerpreferencename}}drawer-open-block{{/drawerpreferencename}}
+            {{$forceopen}}{{#forceblockdraweropen}}1{{/forceblockdraweropen}}{{/forceopen}}
+            {{$drawerstate}}show-drawer-right{{/drawerstate}}
+            {{$tooltipplacement}}left{{/tooltipplacement}}
+            {{$drawercloseonresize}}1{{/drawercloseonresize}}
+            {{$closebuttontext}}{{#str}}closeblockdrawer, core{{/str}}{{/closebuttontext}}
+        {{/ theme_boost/drawer}}
+    {{/hasblocks}}
+
+    <!-- Main Content Stage -->
+    <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers rui-main-stage {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container">
+        <div id="topofscroll" class="main-inner rui-stage-inner">
+
+            {{{ output.full_header }}}
+
+            {{#secondarymoremenu}}
+                <div class="secondary-navigation d-print-none">
+                    {{> core/moremenu}}
+                </div>
+            {{/secondarymoremenu}}
+
+            <!-- Rosea Dashboard Stats Cards (Screenshot 2 & 3) -->
+            {{#isdashboard}}
+            <div class="rui-dashboard-header-block d-print-none">
+                <div class="rui-dashboard-stats-kicker">Rosea dashboard stats</div>
+                <div class="rui-dashboard-stats-grid">
+                    <!-- Stat 1: Courses Enrolled -->
+                    <div class="rui-stat-card">
+                        <div class="rui-stat-badge rui-badge-navy">
+                            <i class="fa fa-book"></i>
+                        </div>
+                        <div class="rui-stat-content">
+                            <span class="rui-stat-label">Courses Enrolled</span>
+                            <span class="rui-stat-number">{{dashboardstats.courses_enrolled}}</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat 2: Courses Completed -->
+                    <div class="rui-stat-card">
+                        <div class="rui-stat-badge rui-badge-mint">
+                            <i class="fa fa-graduation-cap"></i>
+                        </div>
+                        <div class="rui-stat-content">
+                            <span class="rui-stat-label">Courses Completed</span>
+                            <span class="rui-stat-number">{{dashboardstats.courses_completed}}</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat 3: Activities Completed -->
+                    <div class="rui-stat-card">
+                        <div class="rui-stat-badge rui-badge-amber">
+                            <i class="fa fa-check"></i>
+                        </div>
+                        <div class="rui-stat-content">
+                            <span class="rui-stat-label">Activities Completed</span>
+                            <span class="rui-stat-number">{{dashboardstats.activities_completed}}</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat 4: Activities Due -->
+                    <div class="rui-stat-card">
+                        <div class="rui-stat-badge rui-badge-rose">
+                            <i class="fa fa-exclamation"></i>
+                        </div>
+                        <div class="rui-stat-content">
+                            <span class="rui-stat-label">Activities Due</span>
+                            <span class="rui-stat-number">{{dashboardstats.activities_due}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/isdashboard}}
+
+            <div id="page-content" class="pb-3 d-print-block">
+                <div id="region-main-box">
+                    {{#hasregionmainsettingsmenu}}
+                    <div id="region-main-settings-menu" class="d-print-none">
+                        <div> {{{ regionmainsettingsmenu }}} </div>
+                    </div>
+                    {{/hasregionmainsettingsmenu}}
+                    <section id="region-main" aria-label="{{#str}}content{{/str}}">
+                        {{#hasregionmainsettingsmenu}}
+                            <div class="region_main_settings_menu_proxy"></div>
+                        {{/hasregionmainsettingsmenu}}
+                        {{{ output.course_content_header }}}
+                        {{#headercontent}}
+                            {{> core/activity_header }}
+                        {{/headercontent}}
+                        {{#overflow}}
+                            <div class="container-fluid tertiary-navigation">
+                                <div class="navitem">
+                                    {{> core/url_select}}
+                                </div>
+                            </div>
+                        {{/overflow}}
+                        {{{ output.main_content }}}
+                        {{{ output.activity_navigation }}}
+                        {{{ output.course_content_footer }}}
+                    </section>
+                </div>
+            </div>
+        </div>
+        {{> theme_boost/footer }}
+    </div>
+    {{{ output.standard_after_main_region_html }}}
+</div>
+</body>
+</html>
+{{#js}}
+M.util.js_pending('theme_boost/loader');
+require(['theme_boost/loader', 'theme_boost/drawer'], function(Loader, Drawer) {
+    Drawer.init();
+    M.util.js_complete('theme_boost/loader');
+});
+
+// Sidebar Toggle Script
+document.addEventListener('DOMContentLoaded', function() {
+    var toggleBtn = document.getElementById('spaceSidebarToggle');
+    var sidebar = document.getElementById('spaceMainSidebar');
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.body.classList.toggle('rui-sidebar-collapsed');
+        });
+    }
+});
+{{/js}}

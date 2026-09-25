@@ -1,0 +1,117 @@
+// Space Theme Preset - Modern, Sleek & Compact
+// Inspired by RoseaThemes Space 5.0.7
+
+// Slate / Modern Monochrome Scale
+$white:    #ffffff !default;
+$gray-100: #f8fafc !default; // slate-50
+$gray-200: #f1f5f9 !default; // slate-100
+$gray-300: #e2e8f0 !default; // slate-200
+$gray-400: #cbd5e1 !default; // slate-300
+$gray-500: #94a3b8 !default; // slate-400
+$gray-600: #64748b !default; // slate-500
+$gray-700: #475569 !default; // slate-600
+$gray-800: #1e293b !default; // slate-800
+$gray-900: #0f172a !default; // slate-900
+$black:    #020617 !default;
+
+// Brand Colors
+$blue:      #3e81eb !default; // Rosea Space Signature Vivid Blue
+$indigo:    #4f46e5 !default;
+$purple:    #7c3aed !default;
+$pink:      #ec4899 !default;
+$red:       #ef4444 !default;
+$orange:    #f97316 !default;
+$yellow:    #eab308 !default;
+$green:     #10b981 !default;
+$teal:      #14b8a6 !default;
+$cyan:      #06b6d4 !default;
+
+$primary:       $blue !default;
+$secondary:     $gray-800 !default;
+$success:       $green !default;
+$info:          $cyan !default;
+$warning:       $yellow !default;
+$danger:        $red !default;
+$light:         $gray-100 !default;
+$dark:          $gray-900 !default;
+
+// Typography & Base
+$font-family-sans-serif: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !default;
+$font-size-base: 0.9375rem !default;
+$line-height-base: 1.55 !default;
+$headings-font-family: inherit !default;
+$headings-font-weight: 700 !default;
+$headings-line-height: 1.25 !default;
+$headings-color: $gray-900 !default;
+$body-bg: #f8fafc !default;
+$body-color: #334155 !default;
+
+// Compact Modern Spacers
+$spacer: 1rem !default;
+$spacers: (
+  0: 0,
+  1: ($spacer * 0.25),
+  2: ($spacer * 0.5),
+  3: ($spacer * 0.85),
+  4: ($spacer * 1.25),
+  5: ($spacer * 1.75),
+  6: ($spacer * 2.5)
+) !default;
+
+// Border Radius & Modern Elevation
+$border-radius:        0.625rem !default; // 10px sleek
+$border-radius-lg:     0.875rem !default; // 14px
+$border-radius-sm:     0.375rem !default; // 6px
+$border-radius-pill:   50rem !default;
+
+$box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !default;
+$box-shadow:    0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.06) !default;
+$box-shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04) !default;
+
+// Cards
+$card-spacer-y:         1.125rem !default;
+$card-spacer-x:         1.25rem !default;
+$card-border-width:     1px !default;
+$card-border-radius:    $border-radius-lg !default;
+$card-border-color:     #e2e8f0 !default;
+$card-cap-bg:           #ffffff !default;
+$card-bg:               #ffffff !default;
+$card-shadow:           $box-shadow !default;
+
+// Buttons
+$btn-padding-y:         0.5rem !default;
+$btn-padding-x:         1rem !default;
+$btn-font-size:         0.875rem !default;
+$btn-border-radius:     $border-radius !default;
+$btn-font-weight:       600 !default;
+$btn-focus-width:       0.2rem !default;
+$btn-focus-box-shadow:  0 0 0 3px rgba($primary, 0.2) !default;
+
+// Form Inputs
+$input-padding-y:       0.5rem !default;
+$input-padding-x:       0.875rem !default;
+$input-font-size:       0.875rem !default;
+$input-line-height:     1.4 !default;
+$input-bg:              #ffffff !default;
+$input-border-color:    #cbd5e1 !default;
+$input-border-radius:   $border-radius !default;
+$input-box-shadow:      inset 0 1px 1px rgba(0, 0, 0, 0.03) !default;
+$input-focus-border-color: $primary !default;
+$input-focus-box-shadow: 0 0 0 3px rgba($primary, 0.18) !default;
+
+// Navbar
+$navbar-padding-y:      0.65rem !default;
+$navbar-padding-x:      1.25rem !default;
+$navbar-light-color:    #475569 !default;
+$navbar-light-hover-color: $gray-900 !default;
+$navbar-light-active-color: $primary !default;
+
+// Drawers & Sidebars
+$drawer-width:          280px !default;
+$drawer-left-width:     280px !default;
+$drawer-right-width:    310px !default;
+
+// Import Bootstrap & Moodle core
+@import "fontawesome";
+@import "bootstrap";
+@import "moodle";
