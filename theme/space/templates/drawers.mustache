@@ -118,6 +118,105 @@ window.toggleFocusMode = function(e) {
     } catch(err) {}
 };
 
+window.closeBlockDrawer = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    var drawer = document.getElementById('theme_boost-drawers-blocks');
+    if (!drawer) return;
+
+    // 1. Try closing via Boost Drawers instance if available
+    try {
+        var Drawers = (window.MoodleDrawers && window.MoodleDrawers.default) ? window.MoodleDrawers.default : window.MoodleDrawers;
+        if (Drawers && typeof Drawers.getDrawerInstanceForNode === 'function') {
+            var inst = Drawers.getDrawerInstanceForNode(drawer);
+            if (inst && typeof inst.closeDrawer === 'function') {
+                inst.closeDrawer();
+            }
+        }
+    } catch(err) {
+        console.warn('Boost closeDrawer exception:', err);
+    }
+
+    // 2. Direct DOM and layout cleanup
+    drawer.classList.remove('show');
+    drawer.classList.add('hidden');
+    drawer.setAttribute('aria-expanded', 'false');
+    drawer.setAttribute('aria-hidden', 'true');
+    drawer.style.setProperty('transform', 'translateX(100%)', 'important');
+    drawer.style.setProperty('visibility', 'hidden', 'important');
+    drawer.style.setProperty('pointer-events', 'none', 'important');
+
+    var page = document.getElementById('page');
+    if (page) {
+        page.classList.remove('show-drawer-right');
+        page.style.removeProperty('margin-right');
+    }
+    document.body.classList.remove('show-drawer-right');
+
+    var btn = document.getElementById('hiddenSidebarToggle');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+
+    try {
+        localStorage.setItem('space_blocks_open', '0');
+        if (window.require) {
+            require(['core_user/repository'], function(UserRepository) {
+                if (UserRepository && typeof UserRepository.setUserPreference === 'function') {
+                    UserRepository.setUserPreference('drawer-open-block', false);
+                }
+            });
+        }
+    } catch(err) {}
+};
+
+window.openBlockDrawer = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    var drawer = document.getElementById('theme_boost-drawers-blocks');
+    if (!drawer) return;
+
+    try {
+        var Drawers = (window.MoodleDrawers && window.MoodleDrawers.default) ? window.MoodleDrawers.default : window.MoodleDrawers;
+        if (Drawers && typeof Drawers.getDrawerInstanceForNode === 'function') {
+            var inst = Drawers.getDrawerInstanceForNode(drawer);
+            if (inst && typeof inst.openDrawer === 'function') {
+                inst.openDrawer();
+            }
+        }
+    } catch(err) {
+        console.warn('Boost openDrawer exception:', err);
+    }
+
+    drawer.classList.add('show');
+    drawer.classList.remove('hidden');
+    drawer.setAttribute('aria-expanded', 'true');
+    drawer.setAttribute('aria-hidden', 'false');
+    drawer.style.removeProperty('transform');
+    drawer.style.removeProperty('visibility');
+    drawer.style.removeProperty('pointer-events');
+
+    var page = document.getElementById('page');
+    if (page) page.classList.add('show-drawer-right');
+    document.body.classList.add('show-drawer-right');
+
+    var btn = document.getElementById('hiddenSidebarToggle');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+
+    try {
+        localStorage.setItem('space_blocks_open', '1');
+        if (window.require) {
+            require(['core_user/repository'], function(UserRepository) {
+                if (UserRepository && typeof UserRepository.setUserPreference === 'function') {
+                    UserRepository.setUserPreference('drawer-open-block', true);
+                }
+            });
+        }
+    } catch(err) {}
+};
+
 window.toggleBlockDrawer = function(e) {
     if (e) {
         e.preventDefault();
@@ -125,22 +224,12 @@ window.toggleBlockDrawer = function(e) {
     }
     var drawer = document.getElementById('theme_boost-drawers-blocks');
     if (!drawer) return;
-    var Drawers = (window.MoodleDrawers && window.MoodleDrawers.default) ? window.MoodleDrawers.default : window.MoodleDrawers;
-    if (Drawers && typeof Drawers.getDrawerInstanceForNode === 'function') {
-        var inst = Drawers.getDrawerInstanceForNode(drawer);
-        if (inst) {
-            inst.toggleVisibility();
-            return;
-        }
+    var isOpen = drawer.classList.contains('show') && drawer.style.visibility !== 'hidden';
+    if (isOpen) {
+        window.closeBlockDrawer(e);
+    } else {
+        window.openBlockDrawer(e);
     }
-    var page = document.getElementById('page');
-    var isOpening = !drawer.classList.contains('show');
-    drawer.classList.toggle('show', isOpening);
-    drawer.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
-    if (page) page.classList.toggle('show-drawer-right', isOpening);
-    var btn = document.getElementById('hiddenSidebarToggle');
-    if (btn) btn.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
-    try { localStorage.setItem('space_blocks_open', isOpening ? '1' : '0'); } catch(err) {}
 };
 
 try {
@@ -217,10 +306,14 @@ try {
              data-state="show-drawer-right">
             <div class="drawerheader px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
                 <button type="button" class="btn btn-icon btn-dark drawertoggle rui-icon-no-margin" 
-                        onclick="window.toggleBlockDrawer(event)"
+                        data-toggler="drawers"
+                        data-action="closedrawer"
+                        data-target="theme_boost-drawers-blocks"
+                        onclick="window.closeBlockDrawer(event)"
                         id="drawerCloseButtonspace5-drawers-blocks" 
                         aria-label="Close block drawer"
-                        title="Close block drawer">
+                        title="Close block drawer"
+                        aria-expanded="true">
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L6.75 17.25"></path>
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 6.75L17.25 17.25"></path>
@@ -592,6 +685,16 @@ document.addEventListener('click', function(e) {
     var closeBtn = e.target.closest('.rui-sidebar-close-btn, .rui-sidebar-backdrop');
     if (closeBtn) {
         window.closeSpaceMobileSidebar(e);
+        return;
+    }
+    var closeBlockBtn = e.target.closest('#drawerCloseButtonspace5-drawers-blocks, [data-action="closedrawer"][data-target="theme_boost-drawers-blocks"]');
+    if (closeBlockBtn) {
+        window.closeBlockDrawer(e);
+        return;
+    }
+    var toggleBlockBtn = e.target.closest('#hiddenSidebarToggle, [data-action="toggle"][data-target="theme_boost-drawers-blocks"]');
+    if (toggleBlockBtn) {
+        window.toggleBlockDrawer(e);
         return;
     }
 });
