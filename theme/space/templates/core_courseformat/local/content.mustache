@@ -1,0 +1,74 @@
+{{!
+    Space Theme - Course Format Content
+    Places the Expand All button directly OVER the collapse sections items.
+}}
+<div id="course-format-{{uniqid}}" class="course-format-wrapper">
+    <h2 class="accesshide">{{{title}}}</h2>
+    {{{completionhelp}}}
+
+    {{^singlesection}}
+    <!-- Space Theme: Expand all button placed over the collapse items (Image 3) -->
+    <div class="rui-course-collapseall-bar d-flex justify-content-end align-items-center mb-3">
+        <a
+            id="collapsesections"
+            class="btn rui-btn-collapseall section-collapsemenu"
+            href="#"
+            aria-expanded="false"
+            role="button"
+            data-toggle="toggleall"
+        >
+            <span class="collapseall text-nowrap">{{#str}}collapseall{{/str}}</span>
+            <span class="expandall text-nowrap">{{#str}}expandall{{/str}}</span>
+        </a>
+    </div>
+    {{/singlesection}}
+
+    <ul class="{{format}}" data-for="course_sectionlist">
+        {{#initialsection}}
+            {{$ core_courseformat/local/content/section }}
+                {{> core_courseformat/local/content/section }}
+            {{/ core_courseformat/local/content/section }}
+        {{/initialsection}}
+        {{#sections}}
+            {{$ core_courseformat/local/content/section }}
+                {{> core_courseformat/local/content/section }}
+            {{/ core_courseformat/local/content/section }}
+        {{/sections}}
+    </ul>
+    {{#hasnavigation}}
+    <div class="single-section">
+        {{#sectionnavigation}}
+            {{$ core_courseformat/local/content/sectionnavigation }}
+                {{> core_courseformat/local/content/sectionnavigation }}
+            {{/ core_courseformat/local/content/sectionnavigation }}
+        {{/sectionnavigation}}
+        <ul class="{{format}}">
+        {{#singlesection}}
+            {{$ core_courseformat/local/content/section }}
+                {{> core_courseformat/local/content/section }}
+            {{/ core_courseformat/local/content/section }}
+        {{/singlesection}}
+        </ul>
+        {{#sectionselector}}
+            {{$ core_courseformat/local/content/sectionselector }}
+                {{> core_courseformat/local/content/sectionselector }}
+            {{/ core_courseformat/local/content/sectionselector }}
+        {{/sectionselector}}
+    </div>
+    {{/hasnavigation}}
+    {{#numsections}}
+        {{$ core_courseformat/local/content/addsection}}
+            {{> core_courseformat/local/content/addsection}}
+        {{/ core_courseformat/local/content/addsection}}
+    {{/numsections}}
+    {{#bulkedittools}}
+        {{$ core_courseformat/local/content/bulkedittools}}
+            {{> core_courseformat/local/content/bulkedittools}}
+        {{/ core_courseformat/local/content/bulkedittools}}
+    {{/bulkedittools}}
+</div>
+{{#js}}
+require(['core_courseformat/local/content'], function(component) {
+    component.init('course-format-{{uniqid}}', {}, {{sectionreturn}});
+});
+{{/js}}

@@ -1,0 +1,183 @@
+{{!
+    Space Theme - Secondary Navigation (Pill Capsule Tabs with More Dropdown)
+    Matches Image 2 (Course pill capsule) and Image 3 (Category More dropdown)
+}}
+<nav class="moremenu navigation">
+    <ul id="moremenu-{{moremenuid}}-{{navbarstyle}}" role="{{#istablist}}tablist{{/istablist}}{{^istablist}}menubar{{/istablist}}" class="nav more-nav {{navbarstyle}}">
+        {{#nodecollection}}
+            {{#children}}
+                {{> core/moremenu_children}}
+            {{/children}}
+        {{/nodecollection}}
+        {{#nodearray}}
+            {{> core/moremenu_children}}
+        {{/nodearray}}
+        <li role="none" class="nav-item dropdown dropdownmoremenu d-none" data-region="morebutton">
+            <a class="dropdown-toggle nav-link {{#isactive}}active{{/isactive}}" href="#" id="moremenu-dropdown-{{moremenuid}}" role="{{#istablist}}tab{{/istablist}}{{^istablist}}menuitem{{/istablist}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="-1">
+                {{#str}}moremenu, core{{/str}}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-left" data-region="moredropdown" aria-labelledby="moremenu-dropdown-{{moremenuid}}" role="menu">
+            </ul>
+        </li>
+    </ul>
+</nav>
+<script>
+(function() {
+    var menu = document.getElementById('moremenu-{{moremenuid}}-{{navbarstyle}}');
+    if (!menu) return;
+    var moreButton = menu.querySelector('[data-region="morebutton"]');
+    var moreDropdown = menu.querySelector('[data-region="moredropdown"]');
+    if (!moreDropdown || !moreButton) return;
+
+    var items = menu.querySelectorAll(':scope > [data-forceintomoremenu="true"]');
+    if (items.length > 0) {
+        moreButton.classList.remove('d-none');
+        items.forEach(function(item) {
+            var navLink = item.querySelector('.nav-link');
+            if (navLink) {
+                var a = document.createElement('a');
+                a.className = 'dropdown-item ' + (navLink.classList.contains('active') ? 'active' : '');
+                a.href = navLink.href;
+                a.innerHTML = navLink.innerHTML;
+                if (navLink.getAttribute('data-toggle')) {
+                    a.setAttribute('data-toggle', navLink.getAttribute('data-toggle'));
+                }
+                var li = document.createElement('li');
+                li.role = 'none';
+                li.appendChild(a);
+                moreDropdown.appendChild(li);
+            } else {
+                moreDropdown.appendChild(item);
+            }
+            if (item.parentNode === menu) {
+                menu.removeChild(item);
+            }
+        });
+    }
+})();
+</script>
+{{#js}}
+require(['jquery'], function($) {
+    var menu = document.querySelector('#moremenu-{{moremenuid}}-{{navbarstyle}}');
+    if (!menu) return;
+
+    // Immediately mark as observed to remove any Boost opacity: 0
+    if (menu.parentNode) {
+        menu.parentNode.classList.add('observed');
+    }
+
+    var moreButton = menu.querySelector('[data-region="morebutton"]');
+    var moreDropdown = menu.querySelector('[data-region="moredropdown"]');
+
+
+    // Move only items explicitly designated for More menu (data-forceintomoremenu="true")
+    var nodes = Array.from(menu.children);
+    var hasForced = false;
+    nodes.forEach(function(item) {
+        if (!item.classList.contains('dropdownmoremenu') && item.dataset.forceintomoremenu === 'true') {
+            hasForced = true;
+            if (moreDropdown) {
+                var navLink = item.querySelector('.nav-link');
+                if (navLink) {
+                    var a = document.createElement('a');
+                    a.className = 'dropdown-item ' + (navLink.classList.contains('active') ? 'active' : '');
+                    a.href = navLink.href;
+                    a.innerHTML = navLink.innerHTML;
+                    if (navLink.getAttribute('data-toggle')) {
+                        a.setAttribute('data-toggle', navLink.getAttribute('data-toggle'));
+                    }
+                    var li = document.createElement('li');
+                    li.role = 'none';
+                    li.appendChild(a);
+                    moreDropdown.appendChild(li);
+                } else {
+                    moreDropdown.appendChild(item);
+                }
+                if (item.parentNode === menu) {
+                    menu.removeChild(item);
+                }
+            }
+        }
+    });
+
+    if (hasForced && moreButton) {
+        moreButton.classList.remove('d-none');
+    }
+
+    // Toggle More dropdown reliably on click
+    $(menu).on('click', '[data-region="morebutton"] > .dropdown-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $dropdown = $(this).closest('.dropdown');
+        var isShown = $dropdown.hasClass('show');
+        $('.dropdown.show').not($dropdown).removeClass('show').find('.dropdown-menu').removeClass('show');
+        if (isShown) {
+            $dropdown.removeClass('show');
+            $dropdown.find('.dropdown-menu').removeClass('show');
+            $(this).attr('aria-expanded', 'false');
+        } else {
+            $dropdown.addClass('show');
+            $dropdown.find('.dropdown-menu').addClass('show');
+            $(this).attr('aria-expanded', 'true');
+        }
+    });
+
+    // Close More dropdown when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('[data-region="morebutton"]').length) {
+            $(menu).find('[data-region="morebutton"]').removeClass('show').find('.dropdown-menu').removeClass('show');
+            $(menu).find('[data-region="morebutton"] > .dropdown-toggle').attr('aria-expanded', 'false');
+        }
+    });
+
+    // In-page hash tab switching (e.g. Site Administration: General, Users, Courses, Grades, etc.)
+    $(menu).on('click', '[data-toggle="tab"], [role="tab"]', function(e) {
+        if ($(this).hasClass('dropdown-toggle') || $(this).attr('data-toggle') === 'dropdown') {
+            return; // Don't intercept dropdown toggles
+        }
+        var target = $(this).attr('href') || $(this).data('target');
+        if (!target || target === '#') return;
+        var hashIdx = target.indexOf('#');
+        if (hashIdx !== -1) {
+            var hashTarget = target.substring(hashIdx);
+            if (hashTarget.length > 1 && $(hashTarget).length) {
+                e.preventDefault();
+                $(menu).find('.nav-link').removeClass('active active_tree_node').attr('aria-selected', 'false');
+                $(this).addClass('active active_tree_node').attr('aria-selected', 'true');
+                $('.tab-content > .tab-pane').removeClass('active show');
+                $(hashTarget).addClass('active show');
+            }
+        }
+    });
+
+    // Also support clicking tab links inside the More dropdown
+    if (moreDropdown) {
+        $(moreDropdown).on('click', '[data-toggle="tab"], .dropdown-item', function(e) {
+            var target = $(this).attr('href') || $(this).data('target');
+            if (!target || target === '#') return;
+            var hashIdx = target.indexOf('#');
+            if (hashIdx !== -1) {
+                var hashTarget = target.substring(hashIdx);
+                if (hashTarget.length > 1 && $(hashTarget).length) {
+                    e.preventDefault();
+                    $(menu).find('.nav-link').removeClass('active active_tree_node').attr('aria-selected', 'false');
+                    if (moreButton) {
+                        $(moreButton).find('.dropdown-toggle').addClass('active').attr('aria-selected', 'true');
+                    }
+                    $('.tab-content > .tab-pane').removeClass('active show');
+                    $(hashTarget).addClass('active show');
+                    $(moreButton).removeClass('show').find('.dropdown-menu').removeClass('show');
+                }
+            }
+        });
+    }
+
+    // Check if initial hash is present in URL (e.g. /admin/search.php#linkusers)
+    if (window.location.hash && window.location.hash.length > 1) {
+        var initialLink = $(menu).find('a[href*="' + window.location.hash + '"]');
+        if (initialLink.length) {
+            initialLink.first().trigger('click');
+        }
+    }
+});
+{{/js}}

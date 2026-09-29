@@ -26,10 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 $bodyattributes = $OUTPUT->body_attributes(['pagelayout-login', 'rui-login-split-layout']);
 
+$loginbg = $OUTPUT->image_url('login_bg', 'theme')->out(false);
+
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
-    'bodyattributes' => $bodyattributes
+    'bodyattributes' => $bodyattributes,
+    'loginbg' => $loginbg,
 ];
 
 echo $OUTPUT->render_from_template('theme_space/login', $templatecontext);

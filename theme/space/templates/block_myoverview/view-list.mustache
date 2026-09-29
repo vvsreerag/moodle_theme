@@ -1,0 +1,87 @@
+{{!
+    Space Theme - List View for block_myoverview
+    Matches RoseaThemes Space 5.0.7
+}}
+<div class="rui-course-list mt-3 rui-course-list--myoverview" data-region="card-deck" role="list">
+    {{#courses}}
+    <div class="rui-course-list-item {{#hasprogress}}rui-progress-{{progress}}{{/hasprogress}}" role="listitem" data-region="course-content" data-course-id="{{id}}">
+        <div class="rui-course-list-thumb position-relative">
+            <a href="{{viewurl}}" tabindex="-1" aria-label="{{fullname}}">
+                <figure class="rui-course-list-img" style="background-image: url('{{{courseimage}}}');"></figure>
+            </a>
+            <div class="rui-course-card-icons">
+                <button type="button"
+                        class="rui-course-fav-btn {{#isfavourite}}is-favourite{{/isfavourite}}"
+                        data-action="toggle-favourite"
+                        data-course-id="{{id}}"
+                        id="favorite-icon-{{id}}-{{uniqid}}"
+                        data-region="favourite-icon"
+                        aria-label="{{#isfavourite}}{{#str}} removefromfavourites, block_myoverview {{/str}}{{/isfavourite}}{{^isfavourite}}{{#str}} addtofavourites, block_myoverview {{/str}}{{/isfavourite}}"
+                        title="{{#isfavourite}}Unstar this course{{/isfavourite}}{{^isfavourite}}Star this course{{/isfavourite}}">
+                    <span class="icon-favourite {{^isfavourite}}hidden d-none{{/isfavourite}}" data-region="is-favourite">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span class="sr-only visually-hidden">{{#str}} aria:favourite, block_myoverview {{/str}}</span>
+                    </span>
+                    <span class="icon-not-favourite {{#isfavourite}}hidden d-none{{/isfavourite}}" data-region="not-favourite">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span class="sr-only visually-hidden">{{#str}} aria:notfavourite, block_myoverview {{/str}}</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="rui-course-list-content flex-grow-1">
+            {{#coursecategory}}
+            <div class="rui-course-cat mb-1">
+                <div class="rui-course-cat-badge badge bg-light text-dark">
+                    <span class="text-truncate">{{coursecategory}}</span>
+                </div>
+            </div>
+            {{/coursecategory}}
+            <h4 class="rui-course-list-title mb-0">
+                <a href="{{viewurl}}">
+                    <span class="multiline">{{fullname}}</span>
+                </a>
+            </h4>
+        </div>
+
+        <div class="rui-course-list-actions d-flex align-items-center gap-3">
+            {{#hasprogress}}
+            <div class="rui-mycourse-progress-label flex-shrink-0">
+                <span class="sr-only visually-hidden">Course progress:</span>
+                {{progress}}%
+            </div>
+            {{/hasprogress}}
+
+            <div class="dropdown">
+                <button class="rui-coursemenu-btn" type="button" id="course-menu-toggle-{{id}}-{{uniqid}}" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="menu" aria-expanded="false" aria-controls="course-menu-{{id}}-{{uniqid}}">
+                    <i class="fa fa-bars fa-solid fa-bars" aria-hidden="true"></i>
+                    <span class="sr-only visually-hidden">Actions for course {{fullname}}</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-right" id="course-menu-{{id}}-{{uniqid}}" aria-labelledby="course-menu-toggle-{{id}}-{{uniqid}}">
+                    <button type="button" class="dropdown-item {{#isfavourite}}hidden d-none{{/isfavourite}}" data-action="add-favourite" data-course-id="{{id}}" aria-controls="favorite-icon-{{id}}-{{uniqid}}">
+                        <span class="me-1 mr-1"><i class="fa fa-star-o" aria-hidden="true"></i></span>
+                        Star this course
+                    </button>
+                    <button type="button" class="dropdown-item {{^isfavourite}}hidden d-none{{/isfavourite}}" data-action="remove-favourite" data-course-id="{{id}}" aria-controls="favorite-icon-{{id}}-{{uniqid}}">
+                        <span class="me-1 mr-1"><i class="fa fa-star" aria-hidden="true"></i></span>
+                        Unstar this course
+                    </button>
+                    <button type="button" class="dropdown-item {{^hidden}}hidden d-none{{/hidden}}" data-action="show-course" data-course-id="{{id}}" aria-controls="favorite-icon-{{id}}-{{uniqid}}">
+                        <span class="me-1 mr-1"><i class="fa fa-eye" aria-hidden="true"></i></span>
+                        Restore to view
+                    </button>
+                    <button type="button" class="dropdown-item {{#hidden}}hidden d-none{{/hidden}}" data-action="hide-course" data-course-id="{{id}}" aria-controls="favorite-icon-{{id}}-{{uniqid}}">
+                        <span class="me-1 mr-1"><i class="fa fa-eye-slash" aria-hidden="true"></i></span>
+                        Remove from view
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/courses}}
+</div>

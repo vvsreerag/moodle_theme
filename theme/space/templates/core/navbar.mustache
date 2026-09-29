@@ -1,0 +1,19 @@
+{{!
+    Space Moodle Theme - Breadcrumbs Navbar Template
+}}
+<nav aria-label="{{#str}}breadcrumb, access{{/str}}" class="rui-breadcrumbs-nav">
+    <ol class="breadcrumb mb-0">
+        {{#get_items}}
+            {{#has_action}}
+                <li class="breadcrumb-item{{#is_hidden}} dimmed_text{{/is_hidden}}{{#is_last}} active{{/is_last}}">
+                    <a href="{{{action}}}" {{#is_last}}aria-current="page"{{/is_last}} {{#get_title}}title="{{get_title}}"{{/get_title}}>{{{get_content}}}</a>
+                </li>
+            {{/has_action}}
+            {{^has_action}}
+                <li class="breadcrumb-item{{#is_hidden}} dimmed_text{{/is_hidden}} active">
+                    <span aria-current="page">{{{text}}}</span>
+                </li>
+            {{/has_action}}
+        {{/get_items}}
+    </ol>
+</nav>

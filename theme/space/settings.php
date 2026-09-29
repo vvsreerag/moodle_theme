@@ -97,7 +97,7 @@ if ($ADMIN->fulltree) {
     $name = 'theme_space/bodybg';
     $title = get_string('bodybg', 'theme_space');
     $description = get_string('bodybg_desc', 'theme_space');
-    $default = '#f8fafc';
+    $default = '#ffffff';
     $setting = new admin_setting_configcolourpicker($name, $title, $description, $default);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $page->add($setting);

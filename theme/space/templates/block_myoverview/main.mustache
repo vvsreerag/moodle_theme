@@ -1,0 +1,62 @@
+{{!
+    Space Theme - block_myoverview main template
+    Matches RoseaThemes Space 5.0.7
+}}
+<div id="block-myoverview-{{uniqid}}" class="block-myoverview block-cards" data-region="myoverview" role="navigation" data-init="true">
+    <div role="search" data-region="filter" class="rui-bmo-filter" aria-label="{{#str}} aria:controls, block_myoverview {{/str}}">
+        <div class="rui-bmo-filter__controls w-100 d-flex align-items-center justify-content-between flex-wrap">
+            <div class="d-flex align-items-center">
+                {{> block_myoverview/nav-grouping-selector }}
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                {{> block_myoverview/nav-sort-selector }}
+                {{#displaydropdown}}
+                    {{> block_myoverview/nav-display-selector }}
+                {{/displaydropdown}}
+            </div>
+        </div>
+
+        <div class="rui-bmo-filter__search mt-2">
+            <div class="rui-bmo-filter__search-field">
+                <div id="searchform-auto-{{uniqid}}" class="simplesearchform searchbar">
+                    <div class="search-input-group d-inline-flex justify-content-between w-100 position-relative" role="search">
+                        <label for="searchinput-{{uniqid}}" class="sr-only visually-hidden">
+                            {{#str}} searchcourses, block_myoverview {{/str}}
+                        </label>
+                        <span class="search-input-icon">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                            </svg>
+                        </span>
+                        <input type="text" data-region="input" data-action="search" id="searchinput-{{uniqid}}" class="form-control search-input w-100 withclear" placeholder="{{#str}} search, core {{/str}}" name="search" value="" autocomplete="off">
+                        <button class="search-input-btn d-none" data-action="clearsearch" type="button" aria-label="Clear search input">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L6.75 17.25"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 6.75L17.25 17.25"></path>
+                            </svg>
+                            <span class="sr-only visually-hidden">Clear search input</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid p-0">
+        {{> block_myoverview/courses-view }}
+    </div>
+</div>
+{{#js}}
+require(
+[
+    'jquery',
+    'block_myoverview/main',
+],
+function(
+    $,
+    Main
+) {
+    var root = $('#block-myoverview-{{uniqid}}');
+    Main.init(root);
+});
+{{/js}}

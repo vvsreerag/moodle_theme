@@ -5,6 +5,164 @@
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
+<script>
+window.toggleSpaceSidebar = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    var sidebar = document.getElementById('spaceMainSidebar');
+    if (!sidebar) return;
+
+    if (window.innerWidth < 992) {
+        document.body.classList.remove('rui-sidebar-collapsed');
+        var isOpen = document.body.classList.toggle('rui-sidebar-mobile-open');
+        sidebar.classList.toggle('show', isOpen);
+        if (isOpen) {
+            sidebar.style.setProperty('transform', 'translateX(0)', 'important');
+            sidebar.style.setProperty('visibility', 'visible', 'important');
+            sidebar.style.setProperty('pointer-events', 'auto', 'important');
+        } else {
+            sidebar.style.removeProperty('transform');
+            sidebar.style.removeProperty('visibility');
+            sidebar.style.removeProperty('pointer-events');
+        }
+    } else {
+        document.body.classList.remove('rui-sidebar-mobile-open');
+        var isCollapsed = document.body.classList.toggle('rui-sidebar-collapsed');
+        sidebar.classList.toggle('collapsed', isCollapsed);
+        if (isCollapsed) {
+            sidebar.style.setProperty('transform', 'translateX(-100%)', 'important');
+            sidebar.style.setProperty('visibility', 'hidden', 'important');
+            sidebar.style.setProperty('pointer-events', 'none', 'important');
+        } else {
+            sidebar.style.removeProperty('transform');
+            sidebar.style.removeProperty('visibility');
+            sidebar.style.removeProperty('pointer-events');
+        }
+        try {
+            localStorage.setItem('space_sidebar_collapsed', isCollapsed ? '1' : '0');
+        } catch(err) {}
+    }
+};
+
+window.closeSpaceMobileSidebar = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    document.body.classList.remove('rui-sidebar-mobile-open');
+    var sidebar = document.getElementById('spaceMainSidebar');
+    if (sidebar) {
+        sidebar.classList.remove('show');
+        sidebar.style.removeProperty('transform');
+        sidebar.style.removeProperty('visibility');
+        sidebar.style.removeProperty('pointer-events');
+    }
+};
+
+window.toggleCourseIndex = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    var drawer = document.getElementById('theme_boost-drawers-courseindex');
+    if (!drawer) return;
+    var Drawers = (window.MoodleDrawers && window.MoodleDrawers.default) ? window.MoodleDrawers.default : window.MoodleDrawers;
+    if (Drawers && typeof Drawers.getDrawerInstanceForNode === 'function') {
+        var inst = Drawers.getDrawerInstanceForNode(drawer);
+        if (inst) {
+            inst.toggleVisibility();
+            return;
+        }
+    }
+    var isOpening = !drawer.classList.contains('show');
+    drawer.classList.toggle('show', isOpening);
+    drawer.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+    document.body.classList.toggle('has-course-index-open', isOpening);
+    var page = document.getElementById('page');
+    if (page) page.classList.toggle('show-drawer-left', isOpening);
+};
+
+window.closeCourseIndex = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    var drawer = document.getElementById('theme_boost-drawers-courseindex');
+    if (drawer) {
+        var Drawers = (window.MoodleDrawers && window.MoodleDrawers.default) ? window.MoodleDrawers.default : window.MoodleDrawers;
+        if (Drawers && typeof Drawers.getDrawerInstanceForNode === 'function') {
+            var inst = Drawers.getDrawerInstanceForNode(drawer);
+            if (inst) {
+                inst.closeDrawer();
+                return;
+            }
+        }
+        drawer.classList.remove('show');
+        drawer.setAttribute('aria-expanded', 'false');
+    }
+    document.body.classList.remove('has-course-index-open');
+    var page = document.getElementById('page');
+    if (page) page.classList.remove('show-drawer-left');
+};
+
+window.toggleFocusMode = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    document.body.classList.toggle('rui-focus-mode');
+    try {
+        localStorage.setItem('space_focus_mode', document.body.classList.contains('rui-focus-mode') ? '1' : '0');
+    } catch(err) {}
+};
+
+window.toggleBlockDrawer = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    var drawer = document.getElementById('theme_boost-drawers-blocks');
+    if (!drawer) return;
+    var Drawers = (window.MoodleDrawers && window.MoodleDrawers.default) ? window.MoodleDrawers.default : window.MoodleDrawers;
+    if (Drawers && typeof Drawers.getDrawerInstanceForNode === 'function') {
+        var inst = Drawers.getDrawerInstanceForNode(drawer);
+        if (inst) {
+            inst.toggleVisibility();
+            return;
+        }
+    }
+    var page = document.getElementById('page');
+    var isOpening = !drawer.classList.contains('show');
+    drawer.classList.toggle('show', isOpening);
+    drawer.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+    if (page) page.classList.toggle('show-drawer-right', isOpening);
+    var btn = document.getElementById('hiddenSidebarToggle');
+    if (btn) btn.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+    try { localStorage.setItem('space_blocks_open', isOpening ? '1' : '0'); } catch(err) {}
+};
+
+try {
+    if (window.innerWidth >= 992) {
+        if (localStorage.getItem('space_sidebar_collapsed') === '1') {
+            document.body.classList.add('rui-sidebar-collapsed');
+            var initSidebar = document.getElementById('spaceMainSidebar');
+            if (initSidebar) {
+                initSidebar.classList.add('collapsed');
+                initSidebar.style.setProperty('transform', 'translateX(-100%)', 'important');
+                initSidebar.style.setProperty('visibility', 'hidden', 'important');
+                initSidebar.style.setProperty('pointer-events', 'none', 'important');
+            }
+        }
+    } else {
+        document.body.classList.remove('rui-sidebar-collapsed');
+    }
+    if (localStorage.getItem('space_focus_mode') === '1' && document.body.classList.contains('page-space-course')) {
+        document.body.classList.add('rui-focus-mode');
+    }
+} catch(err) {}
+</script>
 {{> core/local/toast/wrapper}}
 <div id="page-wrapper" class="rui-space-wrapper d-print-block">
 
@@ -15,117 +173,381 @@
 
     <!-- Space Docked Left Sidebar (Screenshots 2, 3, 4, 5) -->
     {{> theme_space/sidebar }}
+    <div class="rui-sidebar-backdrop d-lg-none" onclick="window.closeSpaceMobileSidebar(event)"></div>
 
-    <!-- Course Index Drawer (if in course) -->
+    <!-- Course Index Drawer — Full height, sidebar width, with real 3-dot controls -->
     {{#courseindex}}
-        {{< theme_boost/drawer }}
-            {{$id}}theme_boost-drawers-courseindex{{/id}}
-            {{$drawerheadercontent}}
-                {{> theme_boost/courseindexdrawercontrols}}
-            {{/drawerheadercontent}}
-            {{$drawerclasses}}drawer drawer-left {{#courseindexopen}}show{{/courseindexopen}}{{/drawerclasses}}
-            {{$drawercontent}}
+        <div class="drawer drawer-left rui-courseindex-drawer {{#courseindexopen}}show{{/courseindexopen}} d-print-none not-initialized"
+             id="theme_boost-drawers-courseindex"
+             data-region="fixed-drawer"
+             data-preference="drawer-open-index"
+             data-state="show-drawer-left"
+             data-forceopen="0"
+             data-close-on-resize="0">
+            <div class="drawerheader rui-courseindex-drawer-header">
+                <!-- Close (X) button — wired to Boost drawer JS and fallback -->
+                <button class="btn drawertoggle rui-courseindex-close-btn icon-no-margin"
+                        data-toggler="drawers"
+                        data-action="closedrawer"
+                        data-target="theme_boost-drawers-courseindex"
+                        onclick="window.closeCourseIndex(event)"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="{{#str}}closecourseindex, core{{/str}}"
+                        aria-label="{{#str}}closecourseindex, core{{/str}}">
+                    {{#pix}} e/cancel, core {{/pix}}
+                </button>
+                <!-- 3-dot dropdown: Expand all / Collapse all (+ JS injects Filter by activity / Filter by completion) -->
+                <div class="drawerheadercontent rui-courseindex-controls">
+                    {{> theme_boost/courseindexdrawercontrols}}
+                </div>
+            </div>
+            <div class="drawercontent rui-courseindex-drawer-content drag-container" data-usertour="scroller">
                 {{{courseindex}}}
-            {{/drawercontent}}
-            {{$drawerpreferencename}}drawer-open-index{{/drawerpreferencename}}
-            {{$drawerstate}}show-drawer-left{{/drawerstate}}
-            {{$tooltipplacement}}right{{/tooltipplacement}}
-            {{$closebuttontext}}{{#str}}closecourseindex, core{{/str}}{{/closebuttontext}}
-        {{/ theme_boost/drawer}}
+            </div>
+        </div>
     {{/courseindex}}
 
     <!-- Blocks Drawer -->
     {{#hasblocks}}
-        {{< theme_boost/drawer }}
-            {{$id}}theme_boost-drawers-blocks{{/id}}
-            {{$drawerclasses}}drawer drawer-right{{#blockdraweropen}} show{{/blockdraweropen}}{{/drawerclasses}}
-            {{$drawercontent}}
+        <div class="drawer drawer-right rui-right-drawer rui-blocks-column rui-blocks-area {{#blockdraweropen}}show{{/blockdraweropen}} d-print-none" 
+             id="theme_boost-drawers-blocks" 
+             data-region="fixed-drawer" 
+             data-preference="drawer-open-block" 
+             data-state="show-drawer-right">
+            <div class="drawerheader px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
+                <button type="button" class="btn btn-icon btn-dark drawertoggle rui-icon-no-margin" 
+                        onclick="window.toggleBlockDrawer(event)"
+                        id="drawerCloseButtonspace5-drawers-blocks" 
+                        aria-label="Close block drawer"
+                        title="Close block drawer">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L6.75 17.25"></path>
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 6.75L17.25 17.25"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="drawercontent drag-container p-3" data-usertour="scroller">
                 <section class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
                     {{{ addblockbutton }}}
                     {{{ sidepreblocks }}}
                 </section>
-            {{/drawercontent}}
-            {{$drawerpreferencename}}drawer-open-block{{/drawerpreferencename}}
-            {{$forceopen}}{{#forceblockdraweropen}}1{{/forceblockdraweropen}}{{/forceopen}}
-            {{$drawerstate}}show-drawer-right{{/drawerstate}}
-            {{$tooltipplacement}}left{{/tooltipplacement}}
-            {{$drawercloseonresize}}1{{/drawercloseonresize}}
-            {{$closebuttontext}}{{#str}}closeblockdrawer, core{{/str}}{{/closebuttontext}}
-        {{/ theme_boost/drawer}}
+            </div>
+        </div>
     {{/hasblocks}}
 
     <!-- Main Content Stage -->
     <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers rui-main-stage {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container">
         <div id="topofscroll" class="main-inner rui-stage-inner">
+            <div id="page-content" class="page-content wrapper-page pb-3 d-print-block">
 
-            {{{ output.full_header }}}
-
-            {{#secondarymoremenu}}
-                <div class="secondary-navigation d-print-none">
-                    {{> core/moremenu}}
+                <!-- Drawer Toggles (Top Right Toggle for Blocks Drawer) -->
+                <div class="drawer-toggles d-flex align-items-center">
+                    {{#hasblocks}}
+                    <div id="sidepreopen-control" class="drawer-toggler drawer-right-toggle ms-auto d-print-none">
+                        <button type="button" 
+                                class="btn border-0 icon-no-margin drawertoggle btn-close-drawer--right" 
+                                data-toggler="drawers" 
+                                data-action="toggle" 
+                                data-target="theme_boost-drawers-blocks" 
+                                aria-controls="theme_boost-drawers-blocks" 
+                                aria-expanded="{{#blockdraweropen}}true{{/blockdraweropen}}{{^blockdraweropen}}false{{/blockdraweropen}}" 
+                                id="hiddenSidebarToggle" 
+                                onclick="window.toggleBlockDrawer(event)"
+                                aria-label="Open block drawer" 
+                                title="Open block drawer">
+                            <span class="dir-rtl-hide">
+                                <svg width="20" height="20" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;" aria-hidden="true" focusable="false">
+                                    <g transform="matrix(1,0,0,1,-2,0)">
+                                        <path d="M18.333,15L18.333,5C18.333,3.629 17.205,2.5 15.833,2.5L14.167,2.5C12.795,2.5 11.667,3.629 11.667,5L11.667,15C11.667,16.371 12.795,17.5 14.167,17.5L15.833,17.5C17.205,17.5 18.333,16.371 18.333,15Z" style="fill:none;stroke:currentColor;stroke-width:1.67px;"></path>
+                                    </g>
+                                    <g transform="matrix(1,0,0,1,-2,0)">
+                                        <path d="M11.667,10L5,10M5,10L7.5,7.5M5,10L7.5,12.5" style="fill:none;stroke:currentColor;stroke-width:1.25px;stroke-linecap:round;stroke-linejoin:round;"></path>
+                                    </g>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                    {{/hasblocks}}
                 </div>
-            {{/secondarymoremenu}}
 
-            <!-- Rosea Dashboard Stats Cards (Screenshot 2 & 3) -->
-            {{#isdashboard}}
-            <div class="rui-dashboard-header-block d-print-none">
-                <div class="rui-dashboard-stats-kicker">Rosea dashboard stats</div>
-                <div class="rui-dashboard-stats-grid">
-                    <!-- Stat 1: Courses Enrolled -->
-                    <div class="rui-stat-card">
-                        <div class="rui-stat-badge rui-badge-navy">
-                            <i class="fa fa-book"></i>
+                {{#iscourse}}
+                    <div class="rui-course-hero-wrapper position-relative d-flex align-items-start">
+                        <!-- Two Action Buttons near navbar: Course Index and Focus Mode -->
+                        <div class="rui-course-action-buttons d-flex flex-column d-print-none">
+                            <!-- Button 1: Course Index Toggle -->
+                            <button class="btn rui-course-action-btn rui-btn-courseindex" 
+                                    id="spaceCourseIndexToggle"
+                                    onclick="window.toggleCourseIndex(event)"
+                                    title="Course Index" 
+                                    aria-label="Course Index">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                                    <path d="M9 6H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M5 12.0099L5.01 11.9988" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M3.80029 6.2L4.60029 7L6.60028 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M9 12H18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M9 18H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </button>
+                            <!-- Button 2: Focus Mode Toggle -->
+                            <button class="btn rui-course-action-btn rui-btn-focusmode" 
+                                    id="spaceFocusModeToggle"
+                                    onclick="window.toggleFocusMode(event)"
+                                    title="Focus Mode" 
+                                    aria-label="Focus Mode">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" focusable="false">
+                                    <path d="M9 3H5C3.89543 3 3 3.89543 3 5V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M15 3H19C20.1046 3 21 3.89543 21 5V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M9 21H5C3.89543 21 3 20.1046 3 19V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M15 21H19C20.1046 21 21 20.1046 21 19V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M9 9H15V15H9V9Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </button>
                         </div>
-                        <div class="rui-stat-content">
-                            <span class="rui-stat-label">Courses Enrolled</span>
-                            <span class="rui-stat-number">{{dashboardstats.courses_enrolled}}</span>
+
+                        <!-- Floating Exit Button for Focus Mode (Top Right) -->
+                        <button class="btn rui-focus-mode-exit-btn d-print-none" 
+                                onclick="window.toggleFocusMode(event)"
+                                title="Exit Focus Mode" 
+                                aria-label="Exit Focus Mode">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+
+                        <!-- Hero Content Area -->
+                        <div class="rui-course-hero-content flex-grow-1 min-w-0">
+                            <!-- Line 1: Breadcrumbs -->
+                            <div class="rui-course-breadcrumbs-wrap mb-2 d-print-none">
+                                <nav aria-label="Breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        {{#coursebreadcrumbs}}
+                                            <li class="breadcrumb-item {{#isactive}}active{{/isactive}}">
+                                                {{#isactive}}
+                                                    <span aria-current="page">{{name}}</span>
+                                                {{/isactive}}
+                                                {{^isactive}}
+                                                    <a href="{{url}}">{{name}}</a>
+                                                {{/isactive}}
+                                            </li>
+                                        {{/coursebreadcrumbs}}
+                                    </ol>
+                                </nav>
+                            </div>
+
+                            <!-- Line 2: Secondary Navigation Tabs (Course, Participants, Grades...) -->
+                            {{#secondarymoremenu}}
+                                <div class="secondary-navigation d-print-none mb-3">
+                                    {{> core/moremenu}}
+                                </div>
+                            {{/secondarymoremenu}}
+
+                            <!-- Line 3: Course Title -->
+                            <div class="rui-course-title-wrap">
+                                <h1 class="rui-main-content-title--h1 mb-0">{{coursetitle}}</h1>
+                            </div>
+                        </div>
+                    </div>
+                {{/iscourse}}
+
+                {{^iscourse}}
+                    {{#ismycourses}}
+                        <div class="rui-breadcrumbs w-100 mb-2">
+                            <div id="page-navbar" class="breadcrumbs-container">
+                                <nav aria-label="Breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        {{#canviewdashboard}}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{config.wwwroot}}/my/"><span class="text-truncate">Dashboard</span></a>
+                                        </li>
+                                        {{/canviewdashboard}}
+                                        <li class="breadcrumb-item breadcrumb-item--last active">
+                                            <span aria-current="page" class="d-inline-flex align-items-center"><span class="text-truncate">My courses</span></span>
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="rui-topbar-title d-inline-flex flex-wrap w-100 mb-2">
+                            <header id="page-header" class="page-header-content flex-wrap w-100" data-for="page-heading">
+                                <div class="page-context-header d-flex flex-wrap align-items-center">
+                                    <div class="page-header-headings">
+                                        <h1 class="rui-main-content-title--h1 mb-0">My courses</h1>
+                                    </div>
+                                </div>
+                            </header>
+                        </div>
+                    {{/ismycourses}}
+
+                    {{#iscoursecategory}}
+                        <!-- Line 1: Space Breadcrumbs -->
+                        <div class="rui-breadcrumbs w-100 mb-2">
+                            <div id="page-navbar" class="breadcrumbs-container">
+                                <nav aria-label="Breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        {{#categorybreadcrumbs}}
+                                            <li class="breadcrumb-item {{#isactive}}active breadcrumb-item--last{{/isactive}}">
+                                                {{#isactive}}
+                                                    <span aria-current="page" class="d-inline-flex align-items-center"><span class="text-truncate">{{name}}</span></span>
+                                                {{/isactive}}
+                                                {{^isactive}}
+                                                    <a href="{{url}}"><span class="text-truncate">{{name}}</span></a>
+                                                {{/isactive}}
+                                            </li>
+                                        {{/categorybreadcrumbs}}
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+
+                        <!-- Line 2: Secondary Navigation Tabs (Category, More...) -->
+                        <div class="secondary-navigation d-print-none mb-3">
+                            <nav class="moremenu navigation observed">
+                                <ul id="moremenu-category-nav-tabs" class="nav more-nav nav-tabs" role="menubar">
+                                    <li class="nav-item" role="none">
+                                        <a role="menuitem" class="nav-link active active_tree_node" href="{{categoryurl}}" aria-current="true">
+                                            Category
+                                        </a>
+                                    </li>
+                                    <li role="none" class="nav-item dropdown dropdownmoremenu" data-region="morebutton">
+                                        <button class="dropdown-toggle nav-link" type="button" id="moremenu-dropdown-category" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="menu" aria-expanded="false" aria-controls="moremenu-dropdown-category-menu" aria-label="More">
+                                            More
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" id="moremenu-dropdown-category-menu" data-region="moredropdown" aria-labelledby="moremenu-dropdown-category" role="menu">
+                                            <li role="none">
+                                                <a role="menuitem" class="dropdown-item" href="{{competencyurl}}">
+                                                    Competency frameworks
+                                                </a>
+                                            </li>
+                                            {{#canmanagecategory}}
+                                            <li role="none">
+                                                <a role="menuitem" class="dropdown-item" href="{{managecategoryurl}}">
+                                                    Manage courses and categories
+                                                </a>
+                                            </li>
+                                            <li role="none">
+                                                <a role="menuitem" class="dropdown-item" href="{{addcourseurl}}">
+                                                    Add a new course
+                                                </a>
+                                            </li>
+                                            {{/canmanagecategory}}
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <!-- Line 3: Category Title Heading -->
+                        <div class="rui-topbar-title d-inline-flex flex-wrap w-100 mb-2">
+                            <header id="page-header" class="page-header-content flex-wrap w-100" data-for="page-heading">
+                                <div class="page-context-header d-flex flex-wrap align-items-center">
+                                    <div class="page-header-headings">
+                                        <h1 class="rui-main-content-title--h1 mb-0">{{categorytitle}}</h1>
+                                    </div>
+                                </div>
+                            </header>
+                        </div>
+                    {{/iscoursecategory}}
+
+                    {{^isdashboard}}
+                        {{^ismycourses}}
+                            {{^iscalendar}}
+                                {{^isuserfiles}}
+                                    {{^iscoursecategory}}
+                                        {{{ output.full_header }}}
+                                    {{/iscoursecategory}}
+                                {{/isuserfiles}}
+                            {{/iscalendar}}
+                        {{/ismycourses}}
+                    {{/isdashboard}}
+                    {{#isdashboard}}
+                        <div class="rui-topbar-title d-inline-flex flex-wrap w-100 mb-2">
+                            <header id="page-header" class="page-header-content flex-wrap w-100" data-for="page-heading">
+                                <div class="page-context-header d-flex flex-wrap align-items-center">
+                                    <div class="page-header-headings">
+                                        <h1 class="rui-main-content-title--h1">Dashboard</h1>
+                                    </div>
+                                </div>
+                            </header>
+                        </div>
+                    {{/isdashboard}}
+
+                    {{^iscoursecategory}}
+                        {{#secondarymoremenu}}
+                            <div class="secondary-navigation d-print-none mb-3">
+                                {{> core/moremenu}}
+                            </div>
+                        {{/secondarymoremenu}}
+                    {{/iscoursecategory}}
+                {{/iscourse}}
+
+                <!-- Dashboard Stats Cards (Space 5 roseadashboardstats) -->
+                {{#isdashboard}}
+                {{#canviewdashboard}}
+                <div class="roseadashboardstats-wrap row row-cols-1 row-cols-md-2 row-cols-xl-4 g-2 mb-4 d-print-none" data-region="roseadashboardstats-wrap">
+                    <!-- Stat 1: Courses Enrolled -->
+                    <div class="col roseadashboardstats-col">
+                        <div class="roseadashboardstats-item" role="button" tabindex="0">
+                            <div class="roseadashboardstats-iconbox roseadashboardstats-iconbox--1" aria-hidden="true">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div class="roseadashboardstats-content">
+                                <div class="roseadashboardstats-label">Courses Enrolled</div>
+                                <div class="roseadashboardstats-value">{{dashboardstats.courses_enrolled}}</div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Stat 2: Courses Completed -->
-                    <div class="rui-stat-card">
-                        <div class="rui-stat-badge rui-badge-mint">
-                            <i class="fa fa-graduation-cap"></i>
-                        </div>
-                        <div class="rui-stat-content">
-                            <span class="rui-stat-label">Courses Completed</span>
-                            <span class="rui-stat-number">{{dashboardstats.courses_completed}}</span>
+                    <div class="col roseadashboardstats-col">
+                        <div class="roseadashboardstats-item" role="button" tabindex="0">
+                            <div class="roseadashboardstats-iconbox roseadashboardstats-iconbox--2" aria-hidden="true">
+                                <i class="fa fa-graduation-cap"></i>
+                            </div>
+                            <div class="roseadashboardstats-content">
+                                <div class="roseadashboardstats-label">Courses Completed</div>
+                                <div class="roseadashboardstats-value">{{dashboardstats.courses_completed}}</div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Stat 3: Activities Completed -->
-                    <div class="rui-stat-card">
-                        <div class="rui-stat-badge rui-badge-amber">
-                            <i class="fa fa-check"></i>
-                        </div>
-                        <div class="rui-stat-content">
-                            <span class="rui-stat-label">Activities Completed</span>
-                            <span class="rui-stat-number">{{dashboardstats.activities_completed}}</span>
+                    <div class="col roseadashboardstats-col">
+                        <div class="roseadashboardstats-item" role="button" tabindex="0">
+                            <div class="roseadashboardstats-iconbox roseadashboardstats-iconbox--3" aria-hidden="true">
+                                <i class="fa fa-check-circle"></i>
+                            </div>
+                            <div class="roseadashboardstats-content">
+                                <div class="roseadashboardstats-label">Activities Completed</div>
+                                <div class="roseadashboardstats-value">{{dashboardstats.activities_completed}}</div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Stat 4: Activities Due -->
-                    <div class="rui-stat-card">
-                        <div class="rui-stat-badge rui-badge-rose">
-                            <i class="fa fa-exclamation"></i>
-                        </div>
-                        <div class="rui-stat-content">
-                            <span class="rui-stat-label">Activities Due</span>
-                            <span class="rui-stat-number">{{dashboardstats.activities_due}}</span>
+                    <div class="col roseadashboardstats-col">
+                        <div class="roseadashboardstats-item" role="button" tabindex="0">
+                            <div class="roseadashboardstats-iconbox roseadashboardstats-iconbox--4" aria-hidden="true">
+                                <i class="fa fa-exclamation-circle"></i>
+                            </div>
+                            <div class="roseadashboardstats-content">
+                                <div class="roseadashboardstats-label">Activities Due</div>
+                                <div class="roseadashboardstats-value">{{dashboardstats.activities_due}}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {{/isdashboard}}
+                {{/canviewdashboard}}
+                {{/isdashboard}}
 
-            <div id="page-content" class="pb-3 d-print-block">
-                <div id="region-main-box">
+                <div id="region-main-box" class="region-main-wrapper">
                     {{#hasregionmainsettingsmenu}}
                     <div id="region-main-settings-menu" class="d-print-none">
                         <div> {{{ regionmainsettingsmenu }}} </div>
                     </div>
                     {{/hasregionmainsettingsmenu}}
-                    <section id="region-main" aria-label="{{#str}}content{{/str}}">
+                    <main id="region-main" class="region-main-content" tabindex="-1" aria-label="{{#str}}content{{/str}}">
                         {{#hasregionmainsettingsmenu}}
                             <div class="region_main_settings_menu_proxy"></div>
                         {{/hasregionmainsettingsmenu}}
@@ -134,7 +556,7 @@
                             {{> core/activity_header }}
                         {{/headercontent}}
                         {{#overflow}}
-                            <div class="container-fluid tertiary-navigation">
+                            <div class="container-fluid tertiary-navigation mb-3">
                                 <div class="navitem">
                                     {{> core/url_select}}
                                 </div>
@@ -143,7 +565,7 @@
                         {{{ output.main_content }}}
                         {{{ output.activity_navigation }}}
                         {{{ output.course_content_footer }}}
-                    </section>
+                    </main>
                 </div>
             </div>
         </div>
@@ -155,20 +577,240 @@
 </html>
 {{#js}}
 M.util.js_pending('theme_boost/loader');
-require(['theme_boost/loader', 'theme_boost/drawer'], function(Loader, Drawer) {
-    Drawer.init();
+require(['theme_boost/loader', 'theme_boost/drawers'], function(Loader, Drawers) {
+    window.MoodleDrawers = (Drawers && Drawers.default) ? Drawers.default : Drawers;
     M.util.js_complete('theme_boost/loader');
 });
 
-// Sidebar Toggle Script
-document.addEventListener('DOMContentLoaded', function() {
-    var toggleBtn = document.getElementById('spaceSidebarToggle');
-    var sidebar = document.getElementById('spaceMainSidebar');
-    if (toggleBtn && sidebar) {
-        toggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            document.body.classList.toggle('rui-sidebar-collapsed');
+// Global delegated click listeners for Left Sidebar toggle, close button, and backdrop
+document.addEventListener('click', function(e) {
+    var toggleBtn = e.target.closest('#spaceSidebarToggle, [data-action="toggle-space-sidebar"], .rui-sidebar-toggle-btn');
+    if (toggleBtn) {
+        window.toggleSpaceSidebar(e);
+        return;
+    }
+    var closeBtn = e.target.closest('.rui-sidebar-close-btn, .rui-sidebar-backdrop');
+    if (closeBtn) {
+        window.closeSpaceMobileSidebar(e);
+        return;
+    }
+});
+
+// Secondary Navigation Tabs - "More" dropdown toggle handler
+document.addEventListener('click', function(e) {
+    var moreToggle = e.target.closest('.dropdownmoremenu .dropdown-toggle, [data-region="morebutton"] .dropdown-toggle, #moremenu-dropdown-category');
+    if (moreToggle) {
+        e.preventDefault();
+        e.stopPropagation();
+        var parent = moreToggle.closest('.dropdownmoremenu, [data-region="morebutton"]');
+        var menu = parent ? parent.querySelector('.dropdown-menu') : null;
+        if (!menu) return;
+        var isShown = menu.classList.contains('show') || parent.classList.contains('show');
+
+        // Close any other open dropdowns
+        document.querySelectorAll('.dropdownmoremenu.show, [data-region="morebutton"].show').forEach(function(el) {
+            el.classList.remove('show');
+            var btn = el.querySelector('.dropdown-toggle');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+        document.querySelectorAll('.dropdownmoremenu .dropdown-menu.show, [data-region="morebutton"] .dropdown-menu.show').forEach(function(el) {
+            el.classList.remove('show');
+        });
+
+        if (!isShown) {
+            parent.classList.add('show');
+            menu.classList.add('show');
+            moreToggle.setAttribute('aria-expanded', 'true');
+        }
+        return;
+    }
+
+    if (!e.target.closest('.dropdownmoremenu, [data-region="morebutton"]')) {
+        document.querySelectorAll('.dropdownmoremenu.show, [data-region="morebutton"].show').forEach(function(el) {
+            el.classList.remove('show');
+            var btn = el.querySelector('.dropdown-toggle');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+        document.querySelectorAll('.dropdownmoremenu .dropdown-menu.show, [data-region="morebutton"] .dropdown-menu.show').forEach(function(el) {
+            el.classList.remove('show');
+        });
+    }
+});
+
+// Interactive Course Actions Handler (Star, Unstar, Hide, Restore)
+require(['jquery', 'core/ajax', 'core/notification', 'core/pubsub', 'core_course/events', 'core_user/repository'], function($, ajax, Notification, PubSub, CourseEvents, UserRepository) {
+    // Helper to keep both card star button and dropdown options perfectly synchronized
+    function updateCourseFavouriteUI(courseId, isFav) {
+        var $favBtn = $('[data-action="toggle-favourite"][data-course-id="' + courseId + '"]');
+        $favBtn.toggleClass('is-favourite', isFav);
+        var $isFavSpan = $favBtn.find('[data-region="is-favourite"]');
+        var $notFavSpan = $favBtn.find('[data-region="not-favourite"]');
+
+        if (isFav) {
+            $isFavSpan.removeClass('hidden d-none');
+            $notFavSpan.addClass('hidden d-none');
+            $favBtn.attr('title', 'Unstar this course');
+            $favBtn.attr('aria-label', 'Remove from favourites');
+        } else {
+            $isFavSpan.addClass('hidden d-none');
+            $notFavSpan.removeClass('hidden d-none');
+            $favBtn.attr('title', 'Star this course');
+            $favBtn.attr('aria-label', 'Add to favourites');
+        }
+
+        // Sync dropdown menu options
+        var $cards = $('[data-region="course-content"][data-course-id="' + courseId + '"], .rui-course-card[data-course-id="' + courseId + '"], .rui-course-list-item[data-course-id="' + courseId + '"]');
+        $cards.find('[data-action="add-favourite"]').toggleClass('hidden d-none', isFav);
+        $cards.find('[data-action="remove-favourite"]').toggleClass('hidden d-none', !isFav);
+    }
+
+    // 1. Star / Unstar from Card Quick-Button
+    $(document).on('click', '[data-action="toggle-favourite"]', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var $btn = $(this);
+        var courseId = parseInt($btn.data('course-id'), 10);
+        if (!courseId) return;
+
+        var isFav = $btn.hasClass('is-favourite');
+        var newFav = !isFav;
+
+        updateCourseFavouriteUI(courseId, newFav);
+
+        ajax.call([{
+            methodname: 'core_course_set_favourite_courses',
+            args: { courses: [{ id: courseId, favourite: newFav }] }
+        }])[0].then(function(result) {
+            if (result && result.warnings && result.warnings.length > 0) {
+                throw new Error(result.warnings[0].message);
+            }
+            if (PubSub && CourseEvents) {
+                PubSub.publish(newFav ? CourseEvents.favourited : CourseEvents.unfavorited, courseId);
+            }
+        }).catch(function(err) {
+            updateCourseFavouriteUI(courseId, isFav);
+            Notification.exception(err);
+        });
+    });
+
+    // 2. Star this course from Dropdown Menu
+    $(document).on('click', '[data-action="add-favourite"]', function(e) {
+        e.preventDefault();
+        var courseId = parseInt($(this).data('course-id'), 10);
+        if (!courseId) return;
+
+        updateCourseFavouriteUI(courseId, true);
+
+        ajax.call([{
+            methodname: 'core_course_set_favourite_courses',
+            args: { courses: [{ id: courseId, favourite: true }] }
+        }])[0].then(function(result) {
+            if (result && result.warnings && result.warnings.length > 0) {
+                throw new Error(result.warnings[0].message);
+            }
+            if (PubSub && CourseEvents) {
+                PubSub.publish(CourseEvents.favourited, courseId);
+            }
+        }).catch(function(err) {
+            updateCourseFavouriteUI(courseId, false);
+            Notification.exception(err);
+        });
+    });
+
+    // 3. Unstar this course from Dropdown Menu
+    $(document).on('click', '[data-action="remove-favourite"]', function(e) {
+        e.preventDefault();
+        var courseId = parseInt($(this).data('course-id'), 10);
+        if (!courseId) return;
+
+        updateCourseFavouriteUI(courseId, false);
+
+        ajax.call([{
+            methodname: 'core_course_set_favourite_courses',
+            args: { courses: [{ id: courseId, favourite: false }] }
+        }])[0].then(function(result) {
+            if (result && result.warnings && result.warnings.length > 0) {
+                throw new Error(result.warnings[0].message);
+            }
+            if (PubSub && CourseEvents) {
+                PubSub.publish(CourseEvents.unfavorited, courseId);
+            }
+        }).catch(function(err) {
+            updateCourseFavouriteUI(courseId, true);
+            Notification.exception(err);
+        });
+    });
+
+    // 4. Remove from view (Hide Course)
+    $(document).on('click', '[data-action="hide-course"]', function(e) {
+        e.preventDefault();
+        var courseId = parseInt($(this).data('course-id'), 10);
+        if (!courseId) return;
+
+        var $card = $(this).closest('[data-region="course-content"], .rui-course-card, .rui-course-list-item');
+        var $hideItem = $card.find('[data-action="hide-course"]');
+        var $showItem = $card.find('[data-action="show-course"]');
+
+        $hideItem.addClass('hidden d-none');
+        $showItem.removeClass('hidden d-none');
+
+        // Check active grouping filter
+        var currentGrouping = $('[data-region="courses-view"]').attr('data-grouping');
+        if (currentGrouping && currentGrouping !== 'allincludinghidden') {
+            $card.fadeOut(250, function() {
+                $(this).remove();
+            });
+        }
+
+        UserRepository.setUserPreference('block_myoverview_hidden_course_' + courseId, true)
+            .catch(function(err) {
+                $hideItem.removeClass('hidden d-none');
+                $showItem.addClass('hidden d-none');
+                $card.show();
+                Notification.exception(err);
+            });
+    });
+
+    // 5. Restore to view (Show Course)
+    $(document).on('click', '[data-action="show-course"]', function(e) {
+        e.preventDefault();
+        var courseId = parseInt($(this).data('course-id'), 10);
+        if (!courseId) return;
+
+        var $card = $(this).closest('[data-region="course-content"], .rui-course-card, .rui-course-list-item');
+        var $hideItem = $card.find('[data-action="hide-course"]');
+        var $showItem = $card.find('[data-action="show-course"]');
+
+        $showItem.addClass('hidden d-none');
+        $hideItem.removeClass('hidden d-none');
+
+        // Check active grouping filter
+        var currentGrouping = $('[data-region="courses-view"]').attr('data-grouping');
+        if (currentGrouping === 'hidden') {
+            $card.fadeOut(250, function() {
+                $(this).remove();
+            });
+        }
+
+        UserRepository.setUserPreference('block_myoverview_hidden_course_' + courseId, null)
+            .catch(function(err) {
+                $showItem.removeClass('hidden d-none');
+                $hideItem.addClass('hidden d-none');
+                $card.show();
+                Notification.exception(err);
+            });
+    });
+
+    // PubSub events sync
+    if (PubSub && CourseEvents) {
+        PubSub.subscribe(CourseEvents.favourited, function(courseId) {
+            updateCourseFavouriteUI(courseId, true);
+        });
+        PubSub.subscribe(CourseEvents.unfavorited, function(courseId) {
+            updateCourseFavouriteUI(courseId, false);
         });
     }
 });
 {{/js}}
+

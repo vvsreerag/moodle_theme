@@ -1,0 +1,22 @@
+{{!
+    Space Theme - Display dropdown selector (Card / List / Summary)
+}}
+<div class="dropdown mb-1 rui-bmo-filter__display">
+    <button id="displaydropdown" type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="menu" aria-expanded="false" aria-controls="displaydropdown-menu" aria-label="{{#str}} aria:displaydropdown, block_myoverview {{/str}}">
+        <i class="fa fa-th-large fa-solid fa-table-cells-large d-md-none" aria-hidden="true"></i>
+        <span class="d-none d-md-inline" data-active-item-text>
+            {{#card}}{{#str}} card, block_myoverview {{/str}}{{/card}}
+            {{#list}}{{#str}} list, block_myoverview {{/str}}{{/list}}
+            {{#summary}}{{#str}} summary, block_myoverview {{/str}}{{/summary}}
+        </span>
+    </button>
+    <ul id="displaydropdown-menu" class="dropdown-menu dropdown-menu-right dropdown-menu-end" role="menu" data-show-active-item data-skip-active-class="true" aria-labelledby="displaydropdown">
+        {{#layouts}}
+        <li>
+            <a class="dropdown-item {{#active}}dropdown-item-active active{{/active}}" href="#" data-display-option="display" data-value="{{id}}" data-pref="{{id}}" aria-label="{{name}}" aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#active}}aria-current="true"{{/active}}>
+                {{name}}
+            </a>
+        </li>
+        {{/layouts}}
+    </ul>
+</div>

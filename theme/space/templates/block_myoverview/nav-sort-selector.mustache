@@ -1,0 +1,27 @@
+{{!
+    Space Theme - Sort dropdown selector
+}}
+<div class="rui-bmo-nav-sort-selector rui-bmo-filter__sort mb-1 d-flex align-items-center mr-2 me-2">
+    <div class="dropdown">
+        <button id="sortingdropdown" type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="{{#str}} aria:sortingdropdown, block_myoverview {{/str}}">
+            <i class="fa fa-arrow-down-short-wide fa-solid fa-arrow-up-wide-short" aria-hidden="true"></i>
+            <span class="d-none d-md-inline ms-md-1 ml-md-1" data-active-item-text>
+                {{#title}}{{#str}} title, block_myoverview {{/str}}{{/title}}
+                {{#lastaccessed}}{{#str}} lastaccessed, block_myoverview {{/str}}{{/lastaccessed}}
+                {{#shortname}}{{#str}} shortname, block_myoverview {{/str}}{{/shortname}}
+            </span>
+        </button>
+        <ul class="dropdown-menu" role="menu" data-show-active-item data-skip-active-class="true" aria-labelledby="sortingdropdown">
+            <li>
+                <a class="dropdown-item dropdown-item-active" href="#" data-filter="sort" data-pref="title" data-value="fullname" aria-label="Sort by course name" aria-controls="courses-view-{{uniqid}}" role="menuitem" aria-current="true">
+                    Sort by course name
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#" data-filter="sort" data-pref="lastaccessed" data-value="ul.timeaccess desc" aria-label="Sort by last accessed" aria-controls="courses-view-{{uniqid}}" role="menuitem">
+                    Sort by last accessed
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -26,13 +26,53 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/behat/lib.php');
 require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->libdir . '/completionlib.php');
 
 // Add block button in editing mode.
 $addblockbutton = $OUTPUT->addblockbutton();
 
-if (isloggedin()) {
+// Determine authentication and guest status.
+$isloggedin = isloggedin() && !isguestuser();
+$isguest = isguestuser();
+$loginurl = get_login_url();
+
+$isdashboard = ($PAGE->pagelayout === 'mydashboard');
+$ismycourses = ($PAGE->pagelayout === 'mycourses' || strpos($PAGE->url->get_path(), '/my/courses.php') !== false);
+$issitehome = ($PAGE->pagelayout === 'frontpage');
+$iscalendar = ($PAGE->pagelayout === 'calendar' || strpos($PAGE->url->get_path(), '/calendar/') !== false);
+$iscoursecategory = ($PAGE->pagelayout === 'coursecategory' || strpos($PAGE->url->get_path(), '/course/index.php') !== false);
+$iscourse = (!$iscoursecategory && ($PAGE->pagelayout === 'course' || ($PAGE->course && $PAGE->course->id > 1)));
+$issiteadmin = $isloggedin && (is_siteadmin() || has_capability('moodle/site:config', context_system::instance()));
+$isuserfiles = (strpos($PAGE->url->get_path(), '/user/files.php') !== false);
+
+// Capabilities & permissions for navigation items.
+$canviewdashboard = $isloggedin && !empty($CFG->enabledashboard);
+$canviewmycourses = $isloggedin;
+$canviewcalendar = $isloggedin;
+
+$canviewprivatefiles = false;
+if ($isloggedin) {
+    $usercontext = context_user::instance($USER->id);
+    $canviewprivatefiles = has_capability('moodle/user:manageownfiles', $usercontext);
+}
+
+$canviewcontentbank = false;
+if ($isloggedin) {
+    $systemcontext = context_system::instance();
+    $canviewcontentbank = has_capability('moodle/contentbank:access', $systemcontext) ||
+                          has_capability('moodle/contentbank:viewunlistedcontent', $systemcontext);
+}
+
+$canedit = $isloggedin && $PAGE->user_allowed_editing();
+
+if ($isloggedin) {
     $courseindexopen = (get_user_preferences('drawer-open-index', false) == true);
-    $blockdraweropen = (get_user_preferences('drawer-open-block') == true);
+    $blockpref = get_user_preferences('drawer-open-block', null);
+    if ($isdashboard || $ismycourses) {
+        $blockdraweropen = false;
+    } else {
+        $blockdraweropen = ($blockpref === null) ? false : ($blockpref == true || $blockpref === '1');
+    }
 } else {
     $courseindexopen = false;
     $blockdraweropen = false;
@@ -42,14 +82,129 @@ if (defined('BEHAT_SITE_RUNNING') && get_user_preferences('behat_keep_drawer_clo
     $blockdraweropen = true;
 }
 
-// Determine active page context.
-$isdashboard = ($PAGE->pagelayout === 'mydashboard');
-$issitehome = ($PAGE->pagelayout === 'frontpage');
-$iscalendar = ($PAGE->pagelayout === 'calendar' || strpos($PAGE->url->get_path(), '/calendar/') !== false);
+$coursetitle = ($PAGE->course && $PAGE->course->id > 1) ? format_string($PAGE->course->fullname) : '';
+$coursebreadcrumbs = [];
+if ($iscourse && $PAGE->course && $PAGE->course->id > 1) {
+    if ($canviewdashboard) {
+        $coursebreadcrumbs[] = ['name' => 'Dashboard', 'url' => (new moodle_url('/my/'))->out(false)];
+    }
+    if ($canviewmycourses) {
+        $coursebreadcrumbs[] = ['name' => 'My courses', 'url' => (new moodle_url('/my/courses.php'))->out(false)];
+    }
+    $coursebreadcrumbs[] = ['name' => $coursetitle, 'url' => (new moodle_url('/course/view.php', ['id' => $PAGE->course->id]))->out(false), 'isactive' => true];
+}
+
+$calendarbreadcrumbs = [];
+$calendartabs = [];
+if ($iscalendar) {
+    $curview = optional_param('view', 'month', PARAM_ALPHA);
+    $calendartabs = [
+        [
+            'name' => 'Month',
+            'url' => (new moodle_url('/calendar/view.php', ['view' => 'month']))->out(false),
+            'isactive' => ($curview === 'month'),
+        ],
+        [
+            'name' => 'Day',
+            'url' => (new moodle_url('/calendar/view.php', ['view' => 'day']))->out(false),
+            'isactive' => ($curview === 'day'),
+        ],
+        [
+            'name' => 'Upcoming events',
+            'url' => (new moodle_url('/calendar/view.php', ['view' => 'upcoming']))->out(false),
+            'isactive' => ($curview === 'upcoming'),
+        ],
+    ];
+    if ($canviewdashboard) {
+        $calendarbreadcrumbs[] = ['name' => 'Dashboard', 'url' => (new moodle_url('/my/'))->out(false)];
+    }
+    $calendarbreadcrumbs[] = ['name' => 'Calendar', 'url' => (new moodle_url('/calendar/view.php'))->out(false), 'isactive' => true];
+}
+
+$userfilestabs = [];
+$userfilesbreadcrumbs = [];
+if ($isuserfiles && $isloggedin) {
+    $userid = $USER->id;
+    $userfilestabs = [
+        [
+            'name' => 'Profile',
+            'url' => (new moodle_url('/user/profile.php', ['id' => $userid]))->out(false),
+            'isactive' => false,
+        ],
+        [
+            'name' => 'Private files',
+            'url' => (new moodle_url('/user/files.php'))->out(false),
+            'isactive' => true,
+        ],
+        [
+            'name' => 'Preferences',
+            'url' => (new moodle_url('/user/preferences.php'))->out(false),
+            'isactive' => false,
+        ],
+    ];
+    if ($canviewdashboard) {
+        $userfilesbreadcrumbs[] = ['name' => 'Dashboard', 'url' => (new moodle_url('/my/'))->out(false)];
+    }
+    $userfilesbreadcrumbs[] = ['name' => 'Private files', 'url' => (new moodle_url('/user/files.php'))->out(false), 'isactive' => true];
+}
+
+$categorytitle = 'Courses';
+$categorybreadcrumbs = [];
+$categorytabs = [];
+if ($iscoursecategory) {
+    $categoryid = optional_param('categoryid', 0, PARAM_INT);
+    $catid = 1;
+    if (!empty($PAGE->category)) {
+        $catid = $PAGE->category->id;
+        $categorytitle = format_string($PAGE->category->name, true, ['context' => context_coursecat::instance($catid)]);
+    } else if ($categoryid) {
+        $catid = $categoryid;
+        try {
+            $cat = core_course_category::get($categoryid);
+            $categorytitle = format_string($cat->name, true, ['context' => context_coursecat::instance($cat->id)]);
+        } catch (\Exception $e) {
+            $categorytitle = 'Platform Administration';
+        }
+    } else {
+        $categorytitle = 'Platform Administration';
+    }
+
+    if ($canviewdashboard) {
+        $categorybreadcrumbs[] = ['name' => 'Dashboard', 'url' => (new moodle_url('/my/'))->out(false)];
+    }
+    $categorybreadcrumbs[] = ['name' => 'Courses', 'url' => (new moodle_url('/course/index.php'))->out(false)];
+    $categorybreadcrumbs[] = [
+        'name' => $categorytitle,
+        'url' => (new moodle_url('/course/index.php', ['categoryid' => $catid]))->out(false),
+        'isactive' => true
+    ];
+
+    $categorycontext = context_coursecat::instance($catid);
+    $categoryurl = (new moodle_url('/course/index.php', ['categoryid' => $catid]))->out(false);
+    $competencyurl = (new moodle_url('/admin/tool/lp/competencyframeworks.php', ['pagecontextid' => $categorycontext->id]))->out(false);
+    $canmanagecategory = has_capability('moodle/category:manage', $categorycontext) || $issiteadmin;
+    $managecategoryurl = (new moodle_url('/course/management.php', ['categoryid' => $catid]))->out(false);
+    $addcourseurl = (new moodle_url('/course/edit.php', ['category' => $catid]))->out(false);
+
+    $categorytabs = [
+        [
+            'name' => 'Category',
+            'url' => $categoryurl,
+            'isactive' => true,
+        ],
+    ];
+}
 
 $extraclasses = ['uses-drawers', 'theme-space', 'has-space-sidebar'];
 if ($isdashboard) {
     $extraclasses[] = 'page-space-dashboard';
+}
+if ($ismycourses) {
+    $extraclasses[] = 'page-mycourses';
+    $extraclasses[] = 'page-space-mycourses';
+}
+if ($iscourse) {
+    $extraclasses[] = 'page-space-course';
 }
 
 $blockshtml = $OUTPUT->blocks('side-pre');
@@ -63,7 +218,7 @@ if (!$courseindex) {
 }
 
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
-$forceblockdraweropen = $OUTPUT->firstview_fakeblocks();
+$forceblockdraweropen = method_exists($OUTPUT, 'firstview_fakeblocks') ? $OUTPUT->firstview_fakeblocks() : false;
 
 $secondarynavigation = false;
 $overflow = '';
@@ -94,7 +249,7 @@ try {
     foreach ($allcategories as $cat) {
         if ($cat->is_uservisible()) {
             $sidebarcategories[] = [
-                'name' => $cat->get_formatted_name(),
+                'name' => format_string($cat->name, true, ['context' => context_system::instance()]),
                 'url' => (new moodle_url('/course/index.php', ['categoryid' => $cat->id]))->out(false),
                 'coursecount' => $cat->coursecount,
                 'isactive' => (isset($PAGE->category) && $PAGE->category->id == $cat->id),
@@ -108,58 +263,60 @@ try {
 } catch (\Exception $e) {
     // Fallback if not available.
 }
-if (empty($sidebarcategories)) {
-    $sidebarcategories = [
-        ['name' => 'Platform Administration', 'coursecount' => 9, 'url' => '#', 'isactive' => false],
-        ['name' => 'Admin Level', 'coursecount' => 2, 'url' => '#', 'isactive' => false],
-        ['name' => 'Platform Basics', 'coursecount' => 2, 'url' => '#', 'isactive' => false],
-    ];
-}
+$hassidebarcategories = !empty($sidebarcategories);
 
-// Fetch user's courses for Space sidebar.
+// Fetch user's courses for Space sidebar (strictly enrolled courses for logged-in users only).
 $sidebarmycourses = [];
-try {
-    if (isloggedin() && !isguestuser()) {
-        $mycourses = enrol_get_my_courses('id, fullname, shortname');
+$hasmycourses = false;
+if ($isloggedin) {
+    try {
+        $mycourses = enrol_get_my_courses('id, fullname, shortname, enablecompletion');
         foreach ($mycourses as $mc) {
+            $progress = 0;
+            if (!empty($mc->enablecompletion)) {
+                $progresspercentage = \core_completion\progress::get_course_progress_percentage($mc, $USER->id);
+                if ($progresspercentage !== null) {
+                    $progress = round($progresspercentage);
+                }
+            }
             $sidebarmycourses[] = [
-                'fullname' => $mc->fullname,
+                'fullname' => format_string($mc->fullname, true, ['context' => context_course::instance($mc->id)]),
                 'url' => (new moodle_url('/course/view.php', ['id' => $mc->id]))->out(false),
-                'progress' => rand(30, 85),
+                'progress' => $progress,
             ];
-            if (count($sidebarmycourses) >= 6) {
+            if (count($sidebarmycourses) >= 8) {
                 break;
             }
         }
+        $hasmycourses = !empty($sidebarmycourses);
+    } catch (\Exception $e) {
+        // Fallback.
     }
-    if (empty($sidebarmycourses)) {
-        $allcourses = get_courses();
-        foreach ($allcourses as $ac) {
-            if ($ac->id != 1) {
-                $sidebarmycourses[] = [
-                    'fullname' => $ac->fullname,
-                    'url' => (new moodle_url('/course/view.php', ['id' => $ac->id]))->out(false),
-                    'progress' => 38,
-                ];
-                if (count($sidebarmycourses) >= 4) {
-                    break;
+}
+
+// Dashboard statistics (only computed for logged-in user on dashboard).
+$enrolledcount = 0;
+$completedcount = 0;
+if ($isloggedin && $isdashboard) {
+    try {
+        $mycourses = enrol_get_my_courses('id, enablecompletion');
+        $enrolledcount = count($mycourses);
+        foreach ($mycourses as $mc) {
+            if (!empty($mc->enablecompletion)) {
+                $cinfo = new completion_info($mc);
+                if ($cinfo->is_course_complete($USER->id)) {
+                    $completedcount++;
                 }
             }
         }
+    } catch (\Exception $e) {
+        // Fallback.
     }
-} catch (\Exception $e) {
-    // Fallback.
-}
-
-// Dashboard statistics.
-$enrolledcount = count($sidebarmycourses);
-if ($enrolledcount == 0) {
-    $enrolledcount = 10;
 }
 $dashboardstats = [
     'courses_enrolled' => $enrolledcount,
-    'courses_completed' => '0/' . $enrolledcount,
-    'activities_completed' => '20/32',
+    'courses_completed' => $completedcount . '/' . $enrolledcount,
+    'activities_completed' => '0',
     'activities_due' => '0',
 ];
 
@@ -183,12 +340,42 @@ $templatecontext = [
     'overflow' => $overflow,
     'headercontent' => $headercontent,
     'addblockbutton' => $addblockbutton,
+    'isloggedin' => $isloggedin,
+    'isguest' => $isguest,
+    'loginurl' => $loginurl,
+    'canviewdashboard' => $canviewdashboard,
+    'canviewmycourses' => $canviewmycourses,
+    'canviewcalendar' => $canviewcalendar,
+    'canviewprivatefiles' => $canviewprivatefiles,
+    'canviewcontentbank' => $canviewcontentbank,
+    'canedit' => $canedit,
     'isdashboard' => $isdashboard,
+    'ismycourses' => $ismycourses,
     'issitehome' => $issitehome,
     'iscalendar' => $iscalendar,
+    'isuserfiles' => $isuserfiles,
+    'calendartabs' => $calendartabs,
+    'userfilestabs' => $userfilestabs,
+    'calendarbreadcrumbs' => $calendarbreadcrumbs,
+    'userfilesbreadcrumbs' => $userfilesbreadcrumbs,
+    'iscourse' => $iscourse,
+    'issiteadmin' => $issiteadmin,
+    'coursetitle' => $coursetitle,
+    'coursebreadcrumbs' => $coursebreadcrumbs,
+    'hassidebarcategories' => $hassidebarcategories,
     'sidebarcategories' => $sidebarcategories,
+    'hasmycourses' => $hasmycourses,
     'sidebarmycourses' => $sidebarmycourses,
     'dashboardstats' => $dashboardstats,
+    'iscoursecategory' => $iscoursecategory,
+    'categorytitle' => $categorytitle,
+    'categorybreadcrumbs' => $categorybreadcrumbs,
+    'categorytabs' => $categorytabs,
+    'categoryurl' => $categoryurl,
+    'competencyurl' => $competencyurl,
+    'canmanagecategory' => $canmanagecategory,
+    'managecategoryurl' => $managecategoryurl,
+    'addcourseurl' => $addcourseurl,
 ];
 
 echo $OUTPUT->render_from_template('theme_space/drawers', $templatecontext);

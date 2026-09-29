@@ -25,6 +25,8 @@ $CFG->dataroot  = '/home/sreerag/Documents/Projects/Other/moodledata';
 $CFG->admin     = 'admin';
 
 $CFG->directorypermissions = 0777;
+$CFG->themedesignermode = true;
+$CFG->cachejs = false;
 
 require_once(__DIR__ . '/lib/setup.php');
 
