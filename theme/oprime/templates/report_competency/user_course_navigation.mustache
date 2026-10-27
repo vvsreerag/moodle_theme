@@ -1,0 +1,43 @@
+{{!
+    Space Theme - User Course Navigation Template Override for Competency Report
+}}
+<div class="rui-user-course-nav-card float-right mb-3">
+<p class="mb-2">{{{groupselector}}}</p>
+<form class="user-competency-course-navigation">
+<input type="hidden" name="user" value="{{userid}}"/>
+<input type="hidden" name="id" value="{{courseid}}"/>
+<input type="hidden" name="mod" value="{{moduleid}}"/>
+{{#hasusers}}
+<div class="mb-2">
+<label for="user-nav-{{uniqid}}" class="accesshide">{{#str}}jumptouser, tool_lp{{/str}}</label>
+<select id="user-nav-{{uniqid}}" class="form-select">
+{{#users}}
+<option value="{{id}}" {{#selected}}selected="selected"{{/selected}}>{{fullname}}</option>
+{{/users}}
+</select>
+</div>
+{{/hasusers}}
+
+{{#hasmodules}}
+<div>
+<label for="module-nav-{{uniqid}}" class="accesshide">{{#str}}filterbyactivity, tool_lp{{/str}}</label>
+<select id="module-nav-{{uniqid}}" class="form-select">
+{{#modules}}
+<option value="{{id}}" {{#selected}}selected="selected"{{/selected}}>{{name}}</option>
+{{/modules}}
+</select>
+</div>
+{{/hasmodules}}
+</form>
+</div>
+{{#js}}
+require(['core/form-autocomplete', 'report_competency/user_course_navigation'], function(autocomplete, nav) {
+    (new nav('#user-nav-{{uniqid}}', '#module-nav-{{uniqid}}', '{{baseurl}}', {{userid}}, {{courseid}}, {{moduleid}}));
+{{#hasusers}}
+    autocomplete.enhance('#user-nav-{{uniqid}}', false, false, {{# quote }}{{# str }}jumptouser, tool_lp{{/ str }}{{/ quote }});
+{{/hasusers}}
+{{#hasmodules}}
+    autocomplete.enhance('#module-nav-{{uniqid}}', false, false, {{# quote }}{{# str }}filterbyactivity, tool_lp{{/ str }}{{/ quote }});
+{{/hasmodules}}
+});
+{{/js}}

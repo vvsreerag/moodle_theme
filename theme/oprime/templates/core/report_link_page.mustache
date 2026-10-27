@@ -1,0 +1,66 @@
+{{!
+    Space Theme - Modern Course Reports Grid Template
+    Overrides core/report_link_page with rich card grid aesthetics
+}}
+{{#node}}
+<div class="rui-reports-overview-wrapper mb-5">
+    <div class="rui-reports-header mb-4">
+        <h2 class="rui-reports-title font-weight-bold mb-1" style="font-size: 1.5rem; color: #0f172a;">Course Reports</h2>
+        <p class="text-muted mb-0" style="font-size: 0.95rem;">Comprehensive analytics, live audit logs, learner competency progress, and participation reports for this course.</p>
+    </div>
+
+    <div class="rui-reports-grid">
+        {{#node.children}}
+            {{#display}}
+                <a href="{{{action}}}" class="rui-report-card">
+                    <div class="rui-report-card__inner">
+                        <div class="rui-report-card__icon-wrap">
+                            <span class="rui-report-card__icon">
+                                <i class="fa fa-line-chart" data-report-name="{{text}}"></i>
+                            </span>
+                        </div>
+                        <div class="rui-report-card__body">
+                            <h3 class="rui-report-card__title">{{text}}</h3>
+                            <p class="rui-report-card__desc">View detailed analytics, status tracking, and exported records for {{text}}.</p>
+                        </div>
+                        <div class="rui-report-card__footer">
+                            <span class="rui-report-card__btn">
+                                <span>Open report</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 12h14"></path>
+                                    <path d="M12 5l7 7-7 7"></path>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            {{/display}}
+        {{/node.children}}
+    </div>
+</div>
+{{/node}}
+
+<script>
+(function() {
+    // Dynamic icon assigning based on report title
+    var icons = {
+        'competency': 'fa-trophy',
+        'log': 'fa-file-text-o',
+        'live': 'fa-bolt',
+        'activity': 'fa-bar-chart',
+        'participation': 'fa-users',
+        'completion': 'fa-check-circle-o',
+        'grade': 'fa-graduation-cap'
+    };
+    var elements = document.querySelectorAll('.rui-report-card__icon i[data-report-name]');
+    elements.forEach(function(el) {
+        var name = (el.getAttribute('data-report-name') || '').toLowerCase();
+        for (var key in icons) {
+            if (name.indexOf(key) !== -1) {
+                el.className = 'fa ' + icons[key];
+                break;
+            }
+        }
+    });
+})();
+</script>

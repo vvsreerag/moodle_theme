@@ -1,0 +1,53 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Custom Navigation / Context Selector Template for Content Bank
+    Styled to match modern selector dropdown UI
+}}
+{{#allowedcontexts}}
+<div class="cb-context-selector d-inline-block">
+    <form method="{{method}}" action="{{action}}" id="cb_context_select_form" class="d-none">
+        <input type="hidden" name="contextid" id="cb_context_select_input" value="">
+        {{#params}}
+            <input type="hidden" name="{{name}}" value="{{value}}">
+        {{/params}}
+    </form>
+    <div class="dropdown">
+        <button id="cbcontextdropdown" type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-layer-group fa-solid fa-layer-group" aria-hidden="true"></i>
+            <span class="ms-1 ml-1" data-active-item-text>
+                {{#options}}
+                    {{#selected}}{{name}}{{/selected}}
+                    {{#optgroup}}
+                        {{#options}}
+                            {{#selected}}{{name}}{{/selected}}
+                        {{/options}}
+                    {{/optgroup}}
+                {{/options}}
+            </span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="cbcontextdropdown">
+            {{#options}}
+                {{#optgroup}}
+                    <li class="dropdown-header">{{name}}</li>
+                    {{#options}}
+                        <li>
+                            <a class="dropdown-item {{#selected}}dropdown-item-active active{{/selected}}" href="{{action}}?contextid={{value}}" data-value="{{value}}" {{#selected}}aria-current="true"{{/selected}} onclick="var f=document.getElementById('cb_context_select_form'); if(f){f.contextid.value='{{value}}'; f.submit(); return false;}">
+                                {{name}}
+                            </a>
+                        </li>
+                    {{/options}}
+                {{/optgroup}}
+                {{^optgroup}}
+                    {{^ignore}}
+                        <li>
+                            <a class="dropdown-item {{#selected}}dropdown-item-active active{{/selected}}" href="{{action}}?contextid={{value}}" data-value="{{value}}" {{#selected}}aria-current="true"{{/selected}} onclick="var f=document.getElementById('cb_context_select_form'); if(f){f.contextid.value='{{value}}'; f.submit(); return false;}">
+                                {{name}}
+                            </a>
+                        </li>
+                    {{/ignore}}
+                {{/optgroup}}
+            {{/options}}
+        </ul>
+    </div>
+</div>
+{{/allowedcontexts}}
